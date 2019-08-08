@@ -1,26 +1,20 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { FC } from "react";
+import { createCtx } from "./state";
+import reducer, { initialState, IState } from "./state/Reducer";
+import Game from "./components/Game";
+import { TAction } from "./state/Actions";
 
-const App: React.FC = () => {
+export const [ctx, StateProvider] = createCtx<IState, TAction>(
+  initialState,
+  reducer
+);
+
+const App: FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <StateProvider>
+      <Game />
+    </StateProvider>
   );
-}
+};
 
 export default App;
