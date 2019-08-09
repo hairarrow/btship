@@ -1,4 +1,4 @@
-import { IShip, PlayerType, IPosition, IPlayer, IGame, IFleet } from "./Models";
+import { IShip, PlayerType, IPosition, IPlayer, IGame } from "./Models";
 
 export enum GameActions {
   Start = "GAME_START",

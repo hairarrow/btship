@@ -12,7 +12,9 @@ const Game: FC = () => {
     dispatch
   } = useContext(ctx);
 
-  useEffect(() => dispatch(startGame()), []);
+  useEffect(() => {
+    if (!active) dispatch(startGame());
+  }, []);
 
   return active ? <Board /> : <StartScreen />;
 };
