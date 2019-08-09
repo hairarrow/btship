@@ -78,8 +78,27 @@ export function useActions<T extends IState>(
     };
   }
 
+  function selectShip(ship: string): TAction {
+    const { players: playersState } = state;
+    const { fleet: fleetState } = [...playersState].filter(
+      ({ type }) => type === PlayerType.Human
+    )[0];
+    const { ships } = fleetState;
+    const selectedShip = [...ships].filter(({ name }) => name === ship)[0];
+    const fleet = { ...fleetState, selectedShip };
+    const players = [...playersState].map(({ type, ...p }) =>
+      type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+    );
+
+    return {
+      type: PlayerActions.SelectShip,
+      players
+    };
+  }
+
   return {
     createPlayer,
-    startGame
+    startGame,
+    selectShip
   };
 }

@@ -7,7 +7,8 @@ import Fleet from "../Fleet";
 const Board: FC = () => {
   const {
     state: {
-      game: { placing, players }
+      game: { placing },
+      players
     }
   } = useContext(ctx);
 

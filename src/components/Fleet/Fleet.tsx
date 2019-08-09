@@ -3,13 +3,11 @@ import { ctx } from "../../App";
 
 const Fleet: FC<{ player: string }> = ({ player }) => {
   const {
-    state: {
-      game: { players }
-    }
+    state: { players }
   } = useContext(ctx);
   const {
     fleet: { ships, selectedShip }
-  } = players.filter(({ type }) => type === player)[0];
+  } = [...players].filter(({ type }) => type === player)[0];
 
   return (
     <div>

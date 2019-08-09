@@ -73,15 +73,14 @@ export interface IFleet {
 }
 
 export interface IGame {
-  stats: IStats;
   gridSize: number;
   active: boolean;
   placing: boolean;
-  players: IPlayer[];
   playerTurn: PlayerType;
 }
 
 export interface IState {
-  stats?: IStats;
+  stats: IStats;
   game: IGame;
+  players: IPlayer[];
 }

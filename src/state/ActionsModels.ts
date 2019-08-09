@@ -1,4 +1,4 @@
-import { IShip, PlayerType, IPosition, IPlayer, IGame } from "./Models";
+import { IShip, PlayerType, IPosition, IPlayer, IGame, IFleet } from "./Models";
 
 export enum GameActions {
   Start = "GAME_START",
@@ -23,7 +23,8 @@ export enum ShipActions {
 
 export enum PlayerActions {
   Create = "CREATE_PLAYER",
-  UpdateGridCell = "UPDATE_PLAYER_CELL"
+  UpdateGridCell = "UPDATE_PLAYER_CELL",
+  SelectShip = "SELECT_SHIP"
 }
 
 export enum ActionType {
@@ -34,6 +35,7 @@ export type TAction =
   | { type: GameActions.Start; game: IGame }
   | { type: GameActions.Shoot; targetPlayer: PlayerType; position: IPosition }
   | { type: PlayerActions.Create; player: IPlayer }
+  | { type: PlayerActions.SelectShip; players: IPlayer[] }
   | {
       type:
         | ShipActions.Rotate
@@ -47,4 +49,5 @@ export type TAction =
 export interface IActions {
   createPlayer(p: PlayerType): TAction;
   startGame(): TAction;
+  selectShip(p: string): TAction;
 }

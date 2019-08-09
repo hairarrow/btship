@@ -3,11 +3,9 @@ import { ctx } from "../../App";
 
 const Grid: FC<{ player: string }> = ({ player }) => {
   const {
-    state: {
-      game: { players }
-    }
+    state: { players }
   } = useContext(ctx);
-  const { grid } = players.filter(({ type }) => type === player)[0];
+  const { grid } = [...players].filter(({ type }) => type === player)[0];
   console.log(grid);
   return <div>{player}</div>;
 };
