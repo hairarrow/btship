@@ -13,6 +13,14 @@ const Fleet: FC<{ player: string }> = ({ player }) => {
 
   return (
     <div>
+      {selectedShip ? (
+        <div>
+          <button>Place</button>
+          <button>Rotate</button>
+        </div>
+      ) : (
+        ""
+      )}
       <h2>Fleet</h2>
       <ul>
         {ships.map(({ name, size }) => (

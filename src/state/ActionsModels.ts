@@ -1,4 +1,5 @@
-import { IShip, PlayerType, IPosition, IPlayer, IGame } from "./Models";
+import { PlayerType, IPosition, IPlayer, IGame } from "./Models";
+import { Dispatch } from "react";
 
 export enum GameActions {
   Start = "GAME_START",
@@ -12,42 +13,43 @@ export enum GameActions {
 }
 
 export enum ShipActions {
-  Rotate,
-  Place,
-  CheckPlacement,
-  Hit,
-  Sink,
-  UpdateCoords,
-  Create
+  Rotate = "SHIP_ROTATE",
+  Place = "SHIP_PLACE",
+  CheckPlacement = "SHIP_CHECK_PLACEMENT",
+  Hit = "SHIP_HIT",
+  Sink = "SHIP_SINK",
+  UpdateCoords = "SHIP_UPDATE_PLACEMENT"
 }
 
 export enum PlayerActions {
   Create = "CREATE_PLAYER",
-  UpdateGridCell = "UPDATE_PLAYER_CELL",
+  UpdateGridCells = "UPDATE_PLAYER_CELLS",
   SelectShip = "SELECT_SHIP"
-}
-
-export enum ActionType {
-  UpdateStats
 }
 
 export type TAction =
   | { type: GameActions.Start; game: IGame }
   | { type: GameActions.Shoot; targetPlayer: PlayerType; position: IPosition }
   | { type: PlayerActions.Create; player: IPlayer }
-  | { type: PlayerActions.SelectShip; players: IPlayer[] }
   | {
       type:
+        | PlayerActions.SelectShip
+        | PlayerActions.UpdateGridCells
         | ShipActions.Rotate
-        | ShipActions.CheckPlacement
-        | ShipActions.Hit
-        | ShipActions.Sink
         | ShipActions.UpdateCoords;
-      ship: IShip;
+      players: IPlayer[];
+    }
+  | {
+      type: ShipActions.CheckPlacement | ShipActions.Hit | ShipActions.Sink;
     };
 
 export interface IActions {
   createPlayer(p: PlayerType): TAction;
   startGame(): TAction;
   selectShip(p: string): TAction;
+  rotateShip(p: string): TAction;
+  // moveShip(p: string, position: IPosition): void;
+  moveShip(d: Dispatch<any>): (p: string, position: IPosition) => void;
+  placeShip(p: string, position: IPosition): TAction;
+  updatePlayerGrid(p: IPlayer[]): TAction;
 }

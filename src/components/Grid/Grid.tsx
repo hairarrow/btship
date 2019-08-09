@@ -1,4 +1,4 @@
-import React, { useContext, FC } from "react";
+import React, { useContext, FC, useEffect } from "react";
 import { ctx } from "../../App";
 import StyledGrid from "./Grid.styled";
 import GridCell from "../GridCell";
@@ -11,7 +11,7 @@ const Grid: FC<{ player: string }> = ({ player }) => {
     }
   } = useContext(ctx);
   const { grid } = [...players].filter(({ type }) => type === player)[0];
-  console.log(grid);
+
   return (
     <StyledGrid gridSize={gridSize}>
       {grid.cells.map(cell => (

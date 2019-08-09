@@ -1,5 +1,11 @@
 import { Dispatch } from "react";
-import { TAction, IActions, PlayerActions, GameActions } from "./ActionsModels";
+import {
+  TAction,
+  IActions,
+  PlayerActions,
+  GameActions,
+  ShipActions
+} from "./ActionsModels";
 import {
   IState,
   PlayerType,
@@ -10,15 +16,19 @@ import {
   ShipDirection,
   IFleet,
   IPlayer,
-  IGame
+  IGame,
+  IPosition
 } from "./Models";
 import DEFAULT_SHIPS from "../components/Ship/DefaultShips";
 
 export function useActions<T extends IState>(
   state: T,
-  // TODO Fix this dispatch actions. Can't pass one of these actions through to dispatch
   dispatch: Dispatch<any>
 ): IActions {
+  const withRefresh = (d: typeof dispatch) => (f: TAction) => {
+    if (f.type !== ShipActions.UpdateCoords) return;
+    d(updatePlayerGrid(f.players));
+  };
   function createGrid(size: number): IGrid {
     const cells: ICell[] = Array.from(Array(size).keys()).reduce<ICell[]>(
       (acc, x) => {
@@ -96,9 +106,162 @@ export function useActions<T extends IState>(
     };
   }
 
+  function rotateShip(ship: string): TAction {
+    const { players: playersState } = state;
+    const { fleet: fleetState } = [...playersState].filter(
+      ({ type }) => type === PlayerType.Human
+    )[0];
+    const { ships: shipsState } = fleetState;
+    const ships = [...shipsState].map(({ name, direction, ...s }) =>
+      name === ship
+        ? {
+            ...s,
+            name,
+            direction:
+              direction === ShipDirection.Vertical
+                ? ShipDirection.Horizontal
+                : ShipDirection.Vertical
+          }
+        : { ...s, name, direction }
+    );
+    const fleet = { ...fleetState, ships };
+    const players = [...playersState].map(({ type, ...p }) =>
+      type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+    );
+
+    return {
+      type: ShipActions.Rotate,
+      players
+    };
+  }
+
+  const moveShip = (d: Dispatch<any>) => (ship: string, position: IPosition) =>
+    withRefresh(d)(handleMoveShip(ship, position));
+  function handleMoveShip(ship: string, position: IPosition): TAction {
+    const { players: playersState } = state;
+    const { fleet: fleetState } = [...playersState].filter(
+      ({ type }) => type === PlayerType.Human
+    )[0];
+    const { ships: shipsState } = fleetState;
+    const ships = [...shipsState].map(({ name, ...s }) =>
+      name === ship
+        ? {
+            ...s,
+            name,
+            position,
+            positions: [...Array(s.size)].map((it, idx) =>
+              s.direction === ShipDirection.Vertical
+                ? {
+                    position: {
+                      x: position.x,
+                      y: position.y + idx
+                    },
+                    type: CellType.HoverShip
+                  }
+                : {
+                    position: {
+                      x: position.x + idx,
+                      y: position.y
+                    },
+                    type: CellType.HoverShip
+                  }
+            )
+          }
+        : { ...s, name }
+    );
+    const fleet = { ...fleetState, ships };
+    const players = [...playersState].map(({ type, ...p }) =>
+      type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+    );
+
+    return {
+      type: ShipActions.UpdateCoords,
+      players
+    };
+  }
+
+  // TODO Check collisions and Boundries
+  function placeShip(ship: string, position: IPosition): TAction {
+    const { players: playersState } = state;
+    const { fleet: fleetState } = [...playersState].filter(
+      ({ type }) => type === PlayerType.Human
+    )[0];
+    const { ships: shipsState } = fleetState;
+    const ships = [...shipsState].map(({ name, ...s }) => {
+      return name === ship
+        ? {
+            ...s,
+            name,
+            position,
+            positions: [...Array(s.size)].map((it, idx) =>
+              s.direction === ShipDirection.Vertical
+                ? {
+                    position: {
+                      x: s.position.x,
+                      y: s.position.y + idx
+                    },
+                    type: CellType.PendingShip
+                  }
+                : {
+                    position: {
+                      x: s.position.x + idx,
+                      y: s.position.y
+                    },
+                    type: CellType.PendingShip
+                  }
+            )
+          }
+        : { ...s, name };
+    });
+    const players = [...playersState].map(({ type, ...p }) =>
+      type === PlayerType.Human ? { ...p, ships, type } : { ...p, type }
+    );
+
+    return {
+      type: ShipActions.UpdateCoords,
+      players
+    };
+  }
+
+  // TODO Clean up empty grid positions
+  function updatePlayerGrid(playersState: IPlayer[]): TAction {
+    const { fleet: fleetState, grid: gridState } = [...playersState].filter(
+      ({ type }) => type === PlayerType.Human
+    )[0];
+    const { ships: shipsState } = fleetState;
+    const updateCells = [...shipsState].reduce<ICell[]>(
+      (acc, { positions }) => {
+        return [...acc, ...positions];
+      },
+      []
+    );
+    const cells = [...gridState.cells].map(({ position, ...c }) => {
+      const uC = () =>
+        [...updateCells].filter(
+          ({ position: { x, y } }) => x === position.x && y === position.y
+        )[0];
+      const type = uC() ? uC().type : CellType.Empty;
+      return { ...c, position, type };
+    });
+    const players = [...playersState].map(({ type, ...p }) =>
+      type === PlayerType.Human
+        ? { ...p, grid: { cells }, type }
+        : { ...p, type }
+    );
+
+    return {
+      type: PlayerActions.UpdateGridCells,
+      players
+    };
+  }
+
   return {
     createPlayer,
     startGame,
-    selectShip
+    selectShip,
+    rotateShip,
+    moveShip,
+    placeShip,
+    updatePlayerGrid
   };
 }

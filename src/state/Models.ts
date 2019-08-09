@@ -9,7 +9,9 @@ export enum CellType {
   Miss,
   Ship,
   Hit,
-  Sunk
+  Sunk,
+  PendingShip,
+  HoverShip
 }
 
 export enum ShipDirection {
@@ -34,7 +36,7 @@ export interface IShip {
   placed: boolean;
   direction: ShipDirection;
   position: IPosition;
-  positions: IPosition[];
+  positions: ICell[];
 }
 
 export interface IStats {

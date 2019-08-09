@@ -1,4 +1,9 @@
-import { TAction, PlayerActions, GameActions } from "./ActionsModels";
+import {
+  TAction,
+  PlayerActions,
+  GameActions,
+  ShipActions
+} from "./ActionsModels";
 import { IState, PlayerType } from "./Models";
 
 export const initialState: IState = {
@@ -35,7 +40,10 @@ export default function reducer(
         ...state,
         players: [...state.players, action.player]
       };
+    case ShipActions.UpdateCoords:
+    case ShipActions.Rotate:
     case PlayerActions.SelectShip:
+    case PlayerActions.UpdateGridCells:
       return {
         ...state,
         players: action.players
