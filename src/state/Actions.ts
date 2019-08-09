@@ -48,7 +48,7 @@ export function useActions<T extends IState>(
       position: { x: 0, y: 0 },
       positions: []
     }));
-    const fleet: IFleet = { grid, ships };
+    const fleet: IFleet = { ships, selectedShip: null };
     const player: IPlayer = {
       fleet,
       grid,

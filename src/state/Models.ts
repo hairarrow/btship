@@ -68,8 +68,8 @@ export interface IPlayer {
 }
 
 export interface IFleet {
-  grid: IGrid;
   ships: IShip[];
+  selectedShip: IShip | null;
 }
 
 export interface IGame {
