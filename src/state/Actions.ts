@@ -50,7 +50,6 @@ export function useActions<T extends IState>(
     }));
     const fleet: IFleet = { grid, ships };
     const player: IPlayer = {
-      id: type.toString(),
       fleet,
       grid,
       type
@@ -64,13 +63,13 @@ export function useActions<T extends IState>(
 
   function startGame(): TAction {
     const { game: gameState } = state;
-    const placing = true;
-    [PlayerType.Human, PlayerType.Computer].map(it => {
-      dispatch(createPlayer(it));
-    });
+    [PlayerType.Human, PlayerType.Computer].map(it =>
+      dispatch(createPlayer(it))
+    );
     const game: IGame = {
       ...gameState,
-      placing
+      placing: true,
+      active: true
     };
 
     return {

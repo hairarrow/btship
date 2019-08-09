@@ -1,5 +1,5 @@
-import { TAction, ActionType } from "./ActionsModels";
-import { IState } from "./Models";
+import { TAction, PlayerActions, GameActions } from "./ActionsModels";
+import { IState, PlayerType } from "./Models";
 
 export const initialState: IState = {
   game: {
@@ -18,7 +18,10 @@ export const initialState: IState = {
       }
     },
     gridSize: 10,
-    active: false
+    active: false,
+    placing: false,
+    playerTurn: PlayerType.Human,
+    players: []
   }
 };
 
@@ -27,6 +30,25 @@ export default function reducer(
   action: TAction
 ): IState {
   switch (action.type) {
+    case PlayerActions.Create:
+      const { player } = action;
+      return {
+        ...state,
+        game: {
+          ...state.game,
+          players: [...state.game.players, player]
+        }
+      };
+    case GameActions.Start:
+      const { placing, active } = action.game;
+      return {
+        ...state,
+        game: {
+          ...state.game,
+          placing,
+          active
+        }
+      };
     default:
       return { ...state };
   }

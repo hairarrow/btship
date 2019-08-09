@@ -1,7 +1,7 @@
 export enum PlayerType {
-  Human,
-  Computer,
-  Virtual
+  Human = "HUMAN",
+  Computer = "AI",
+  Virtual = "VIRTUAL"
 }
 
 export enum CellType {
@@ -62,7 +62,6 @@ export interface IGrid {
 }
 
 export interface IPlayer {
-  id: string;
   fleet: IFleet;
   grid: IGrid;
   type: PlayerType;

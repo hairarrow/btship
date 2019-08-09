@@ -1,14 +1,20 @@
 import React, { FC, useContext, useEffect } from "react";
 import { ctx } from "../../App";
+import StartScreen from "../StartScreen";
+import Board from "../Board";
 
 const Game: FC = () => {
-  const { dispatch } = useContext(ctx);
+  const {
+    state: {
+      game: { active }
+    },
+    actions: { startGame },
+    dispatch
+  } = useContext(ctx);
 
-  return (
-    <main>
-      <div>Game</div>
-    </main>
-  );
+  useEffect(() => dispatch(startGame()), []);
+
+  return active ? <Board /> : <StartScreen />;
 };
 
 export default Game;
