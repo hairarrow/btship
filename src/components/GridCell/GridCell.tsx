@@ -27,6 +27,11 @@ const GridCell: FC<{ cell: ICell }> = ({
     moveShip(dispatch)(selectedShip.name, { x, y });
   }, [placing, moveShip, players, x, y]);
 
+  // TODO Handle click
+  // TODO Handle hoverExit
+  // TODO useStateEffect validPlacement
+  
+
   return (
     <StyledGridCell type={type} onMouseEnter={handleHoverEnter}>
       {x}
