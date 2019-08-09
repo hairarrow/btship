@@ -24,13 +24,12 @@ const GridCell: FC<{ cell: ICell }> = ({
     } = [...players].filter(({ type }) => type === PlayerType.Human)[0];
     if (!selectedShip) return;
 
-    moveShip(dispatch)(selectedShip.name, { x, y });
+    dispatch(moveShip(selectedShip.name, { x, y }));
   }, [placing, moveShip, players, x, y]);
 
   // TODO Handle click
   // TODO Handle hoverExit
   // TODO useStateEffect validPlacement
-  
 
   return (
     <StyledGridCell type={type} onMouseEnter={handleHoverEnter}>

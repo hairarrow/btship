@@ -48,8 +48,7 @@ export interface IActions {
   startGame(): TAction;
   selectShip(p: string): TAction;
   rotateShip(p: string): TAction;
-  // moveShip(p: string, position: IPosition): void;
-  moveShip(d: Dispatch<any>): (p: string, position: IPosition) => void;
+  moveShip(p: string, position: IPosition): TAction;
   placeShip(p: string, position: IPosition): TAction;
   updatePlayerGrid(p: IPlayer[]): TAction;
 }

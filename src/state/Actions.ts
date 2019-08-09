@@ -25,10 +25,6 @@ export function useActions<T extends IState>(
   state: T,
   dispatch: Dispatch<any>
 ): IActions {
-  const withRefresh = (d: typeof dispatch) => (f: TAction) => {
-    if (f.type !== ShipActions.UpdateCoords) return;
-    d(updatePlayerGrid(f.players));
-  };
   function createGrid(size: number): IGrid {
     const cells: ICell[] = Array.from(Array(size).keys()).reduce<ICell[]>(
       (acc, x) => {
@@ -135,9 +131,7 @@ export function useActions<T extends IState>(
     };
   }
 
-  const moveShip = (d: Dispatch<any>) => (ship: string, position: IPosition) =>
-    withRefresh(d)(handleMoveShip(ship, position));
-  function handleMoveShip(ship: string, position: IPosition): TAction {
+  function moveShip(ship: string, position: IPosition): TAction {
     const { players: playersState } = state;
     const { fleet: fleetState } = [...playersState].filter(
       ({ type }) => type === PlayerType.Human
@@ -173,6 +167,8 @@ export function useActions<T extends IState>(
     const players = [...playersState].map(({ type, ...p }) =>
       type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
     );
+
+    dispatch(updatePlayerGrid(players));
 
     return {
       type: ShipActions.UpdateCoords,
