@@ -1,8 +1,9 @@
 import React, { FC } from "react";
 import { createCtx } from "./state";
-import reducer, { initialState, IState } from "./state/Reducer";
+import reducer, { initialState } from "./state/Reducer";
+import { IState } from "./state/Models";
 import Game from "./components/Game";
-import { TAction } from "./state/Actions";
+import { TAction } from "./state/ActionsModels";
 
 export const [ctx, StateProvider] = createCtx<IState, TAction>(
   initialState,

@@ -1,74 +1,86 @@
-import { IShip } from "../components/Ship/Ship";
-import { IState } from "./Reducer";
 import { Dispatch } from "react";
+import { TAction, IActions, PlayerActions, GameActions } from "./ActionsModels";
+import {
+  IState,
+  PlayerType,
+  ICell,
+  CellType,
+  IGrid,
+  IShip,
+  ShipDirection,
+  IFleet,
+  IPlayer,
+  IGame
+} from "./Models";
+import DEFAULT_SHIPS from "../components/Ship/DefaultShips";
 
-interface INewShip {
-  name: string;
-  size: number;
-}
-
-export enum ActionType {
-  UpdateStatus,
-  CreateShips,
-  UpdateShipPositions
-}
-
-export type TAction =
-  | { type: ActionType.UpdateShipPositions; ships: IShip[] }
-  | { type: ActionType.UpdateStatus; active: boolean }
-  | { type: ActionType.CreateShips; ships: IShip[] };
-
-export interface IActions {
-  updateGameStatus(p: boolean): TAction;
-  createShips(p: INewShip[]): TAction;
-  updateShipPositions(p: IShip): TAction;
-}
-
-export function useActions<T extends IState, A extends TAction>(
+export function useActions<T extends IState>(
   state: T,
   // TODO Fix this dispatch actions. Can't pass one of these actions through to dispatch
-  dispatch: Dispatch<A>
+  dispatch: Dispatch<any>
 ): IActions {
-  function updateGameStatus(active: boolean): TAction {
-    return {
-      type: ActionType.UpdateStatus,
-      active
-    };
+  function createGrid(size: number): IGrid {
+    const cells: ICell[] = Array.from(Array(size).keys()).reduce<ICell[]>(
+      (acc, x) => {
+        const row = Array.from(Array(size).keys()).map(y => ({
+          position: { x, y },
+          type: CellType.Empty
+        }));
+        return [...acc, ...row];
+      },
+      []
+    );
+    const grid = { cells };
+    return grid;
   }
 
-  function createShips(newShips: INewShip[]): TAction {
-    const ships: IShip[] = [...newShips].map(({ name, size }) => ({
+  function createPlayer(type: PlayerType): TAction {
+    const {
+      game: { gridSize: size }
+    } = state;
+    const grid = createGrid(size);
+    const ships: IShip[] = [...DEFAULT_SHIPS].map(({ name, size }) => ({
       name,
       size,
-      position: {
-        x: 0,
-        y: 0
-      },
+      sunk: false,
+      placed: false,
+      direction: ShipDirection.Vertical,
+      position: { x: 0, y: 0 },
       positions: []
     }));
+    const fleet: IFleet = { grid, ships };
+    const player: IPlayer = {
+      id: type.toString(),
+      fleet,
+      grid,
+      type
+    };
 
     return {
-      type: ActionType.CreateShips,
-      ships
+      type: PlayerActions.Create,
+      player
     };
   }
 
-  function updateShipPositions(updatedShip: IShip): TAction {
-    const {
-      game: { ships: oldShips }
-    } = state;
-    const ships = [...oldShips].map(ship =>
-      updatedShip.name === ship.name ? { ...ship, ...updatedShip } : { ...ship }
-    );
+  function startGame(): TAction {
+    const { game: gameState } = state;
+    const placing = true;
+    [PlayerType.Human, PlayerType.Computer].map(it => {
+      dispatch(createPlayer(it));
+    });
+    const game: IGame = {
+      ...gameState,
+      placing
+    };
+
     return {
-      type: ActionType.UpdateShipPositions,
-      ships
+      type: GameActions.Start,
+      game
     };
   }
 
   return {
-    updateGameStatus,
-    createShips,
-    updateShipPositions
+    createPlayer,
+    startGame
   };
 }

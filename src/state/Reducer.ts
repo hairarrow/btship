@@ -1,21 +1,22 @@
-import { TAction, ActionType } from "./Actions";
-import { IShip } from "../components/Ship/Ship";
-
-export interface IGame {
-  history: any[];
-  ships: IShip[];
-  gridSize: number;
-  active: boolean;
-}
-
-export interface IState {
-  game: IGame;
-}
+import { TAction, ActionType } from "./ActionsModels";
+import { IState } from "./Models";
 
 export const initialState: IState = {
   game: {
-    history: [],
-    ships: [],
+    stats: {
+      shots: {
+        taken: 0,
+        hit: 0
+      },
+      total: {
+        shots: 0,
+        hits: 0
+      },
+      games: {
+        played: 0,
+        won: 0
+      }
+    },
     gridSize: 10,
     active: false
   }
@@ -26,22 +27,6 @@ export default function reducer(
   action: TAction
 ): IState {
   switch (action.type) {
-    case ActionType.UpdateStatus:
-      return {
-        ...state,
-        game: {
-          ...state.game,
-          active: action.active
-        }
-      };
-    case ActionType.CreateShips:
-      return {
-        ...state,
-        game: {
-          ...state.game,
-          ships: action.ships
-        }
-      };
     default:
       return { ...state };
   }

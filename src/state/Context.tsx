@@ -4,9 +4,9 @@ import React, {
   PropsWithChildren,
   useReducer
 } from "react";
-import { useActions as actions, TAction, IActions } from "./Actions";
-
-import { IState } from "./Reducer";
+import { useActions as actions } from "./Actions";
+import { TAction, IActions } from "./ActionsModels";
+import { IState } from "./Models";
 
 type TReducer<S, A> = (state: S, action: A) => S;
 
