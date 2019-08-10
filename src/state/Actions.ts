@@ -129,9 +129,20 @@ export function useActions<T extends IState>(
     };
   }
 
+  // TODO This is broken...
+  function checkValidCoords(grid: ICell[], P: IPosition): boolean {
+    return (
+      P.x <= 9 &&
+      P.y <= 9 &&
+      grid.filter(
+        ({ position: { x, y } }) => `${x}-${y}` === `${P.x}-${P.y}`
+      )[0].type === CellType.Empty
+    );
+  }
+
   function moveShip(ship: string, position: IPosition): TAction {
     const { players: playersState } = state;
-    const { fleet: fleetState } = [...playersState].filter(
+    const { fleet: fleetState, grid } = [...playersState].filter(
       ({ type }) => type === PlayerType.Human
     )[0];
     const { ships: shipsState } = fleetState;
@@ -148,7 +159,12 @@ export function useActions<T extends IState>(
                       x: position.x,
                       y: position.y + idx
                     },
-                    type: CellType.HoverShip
+                    type: checkValidCoords(grid, {
+                      x: position.x,
+                      y: position.y + idx
+                    })
+                      ? CellType.HoverShip
+                      : CellType.InvalidLocation
                   }
                 : {
                     position: {

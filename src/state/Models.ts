@@ -11,7 +11,8 @@ export enum CellType {
   Hit,
   Sunk,
   PendingShip,
-  HoverShip
+  HoverShip,
+  InvalidLocation
 }
 
 export enum ShipDirection {
