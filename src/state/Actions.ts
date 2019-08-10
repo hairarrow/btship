@@ -221,6 +221,33 @@ export function useActions<T extends IState>(
     };
   }
 
+  function removeSelectedShip(): TAction {
+    const { players: playersState } = state;
+    const {
+      fleet: { selectedShip, ships: shipsState }
+    } = [...playersState].filter(({ type }) => type === PlayerType.Human)[0];
+    const ships = [...shipsState].map(({ name, ...s }) =>
+      selectedShip && name === selectedShip.name
+        ? {
+            ...s,
+            name,
+            positions: []
+          }
+        : { ...s, name }
+    );
+    const fleet = { selectedShip, ships };
+    const players = withGridUpdate(
+      [...playersState].map(({ type, ...p }) =>
+        type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+      )
+    );
+
+    return {
+      type: ShipActions.UpdateCoords,
+      players
+    };
+  }
+
   function withGridUpdate(P: IPlayer[]): IPlayer[] {
     const players = [...P].map(({ fleet, grid: G, ...rest }) => {
       const { ships } = fleet;
@@ -263,6 +290,7 @@ export function useActions<T extends IState>(
     selectShip,
     rotateShip,
     moveShip,
-    placeShip
+    placeShip,
+    removeSelectedShip
   };
 }

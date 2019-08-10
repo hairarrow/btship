@@ -8,11 +8,16 @@ const Grid: FC<{ grid: ICell[] }> = ({ grid }) => {
   const {
     state: {
       game: { gridSize }
-    }
+    },
+    actions: { removeSelectedShip },
+    dispatch
   } = useContext(ctx);
 
   return (
-    <StyledGrid gridSize={gridSize} onMouseLeave={() => console.log("left")}>
+    <StyledGrid
+      gridSize={gridSize}
+      onMouseLeave={() => dispatch(removeSelectedShip())}
+    >
       {grid.map(cell => (
         <GridCell
           key={`${cell.position.x}${cell.position.y}`}

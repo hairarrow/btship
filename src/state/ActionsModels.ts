@@ -50,4 +50,5 @@ export interface IActions {
   rotateShip(): TAction;
   moveShip(p: string, position: IPosition): TAction;
   placeShip(p: string, position: IPosition): TAction;
+  removeSelectedShip(): TAction;
 }
