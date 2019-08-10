@@ -1,6 +1,6 @@
-import React, { FC, useContext, useEffect } from "react";
+import React, { FC, useContext, useEffect, useState } from "react";
 import { ctx } from "../../App";
-import { PlayerType } from "../../state/Models";
+import { PlayerType, CellType } from "../../state/Models";
 import Grid from "../Grid";
 import Fleet from "../Fleet";
 
@@ -12,14 +12,14 @@ const Board: FC = () => {
     }
   } = useContext(ctx);
 
-  useEffect(() => {
-    console.log(players);
-  }, [placing, players]);
-
   return placing ? (
     <section>
       <h1>Place your ships!</h1>
-      <Grid player={PlayerType.Human} />
+      <Grid
+        grid={
+          [...players].filter(({ type }) => type === PlayerType.Human)[0].grid
+        }
+      />
       <Fleet player={PlayerType.Human} />
     </section>
   ) : (

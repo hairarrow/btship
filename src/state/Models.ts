@@ -59,13 +59,9 @@ export interface ICell {
   type: CellType;
 }
 
-export interface IGrid {
-  cells: ICell[];
-}
-
 export interface IPlayer {
   fleet: IFleet;
-  grid: IGrid;
+  grid: ICell[];
   type: PlayerType;
 }
 

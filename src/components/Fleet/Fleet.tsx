@@ -4,7 +4,7 @@ import { ctx } from "../../App";
 const Fleet: FC<{ player: string }> = ({ player }) => {
   const {
     state: { players },
-    actions: { selectShip },
+    actions: { selectShip, rotateShip },
     dispatch
   } = useContext(ctx);
   const {
@@ -16,24 +16,25 @@ const Fleet: FC<{ player: string }> = ({ player }) => {
       {selectedShip ? (
         <div>
           <button>Place</button>
-          <button>Rotate</button>
+          <button onClick={() => dispatch(rotateShip())}>Rotate</button>
         </div>
       ) : (
         ""
       )}
       <h2>Fleet</h2>
       <ul>
-        {ships.map(({ name, size }) => (
-          <li
+        {ships.map(({ name, size, placed }) => (
+          <button
             key={name}
             style={{
               color:
-                selectedShip && selectedShip.name === name ? "blue" : "inherit"
+                selectedShip && selectedShip.name === name ? "blue" : "inherit",
+              opacity: placed ? 0.2 : 1
             }}
             onClick={() => dispatch(selectShip(name))}
           >
             {name} – {size}
-          </li>
+          </button>
         ))}
       </ul>
     </div>

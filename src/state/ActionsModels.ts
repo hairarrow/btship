@@ -47,8 +47,7 @@ export interface IActions {
   createPlayer(p: PlayerType): TAction;
   startGame(): TAction;
   selectShip(p: string): TAction;
-  rotateShip(p: string): TAction;
+  rotateShip(): TAction;
   moveShip(p: string, position: IPosition): TAction;
   placeShip(p: string, position: IPosition): TAction;
-  updatePlayerGrid(p: IPlayer[]): TAction;
 }

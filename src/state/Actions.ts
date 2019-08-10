@@ -11,7 +11,6 @@ import {
   PlayerType,
   ICell,
   CellType,
-  IGrid,
   IShip,
   ShipDirection,
   IFleet,
@@ -25,8 +24,8 @@ export function useActions<T extends IState>(
   state: T,
   dispatch: Dispatch<any>
 ): IActions {
-  function createGrid(size: number): IGrid {
-    const cells: ICell[] = Array.from(Array(size).keys()).reduce<ICell[]>(
+  function createGrid(size: number): ICell[] {
+    const grid: ICell[] = Array.from(Array(size).keys()).reduce<ICell[]>(
       (acc, x) => {
         const row = Array.from(Array(size).keys()).map(y => ({
           position: { x, y },
@@ -36,7 +35,7 @@ export function useActions<T extends IState>(
       },
       []
     );
-    const grid = { cells };
+
     return grid;
   }
 
@@ -102,14 +101,13 @@ export function useActions<T extends IState>(
     };
   }
 
-  function rotateShip(ship: string): TAction {
+  function rotateShip(): TAction {
     const { players: playersState } = state;
-    const { fleet: fleetState } = [...playersState].filter(
-      ({ type }) => type === PlayerType.Human
-    )[0];
-    const { ships: shipsState } = fleetState;
+    const {
+      fleet: { selectedShip, ships: shipsState }
+    } = [...playersState].filter(({ type }) => type === PlayerType.Human)[0];
     const ships = [...shipsState].map(({ name, direction, ...s }) =>
-      name === ship
+      selectedShip && name === selectedShip.name
         ? {
             ...s,
             name,
@@ -120,7 +118,7 @@ export function useActions<T extends IState>(
           }
         : { ...s, name, direction }
     );
-    const fleet = { ...fleetState, ships };
+    const fleet = { selectedShip, ships };
     const players = [...playersState].map(({ type, ...p }) =>
       type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
     );
@@ -164,11 +162,11 @@ export function useActions<T extends IState>(
         : { ...s, name }
     );
     const fleet = { ...fleetState, ships };
-    const players = [...playersState].map(({ type, ...p }) =>
-      type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+    const players = withGridUpdate(
+      [...playersState].map(({ type, ...p }) =>
+        type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+      )
     );
-
-    dispatch(updatePlayerGrid(players));
 
     return {
       type: ShipActions.UpdateCoords,
@@ -176,7 +174,7 @@ export function useActions<T extends IState>(
     };
   }
 
-  // TODO Check collisions and Boundries
+  // TODO Check valid placement
   function placeShip(ship: string, position: IPosition): TAction {
     const { players: playersState } = state;
     const { fleet: fleetState } = [...playersState].filter(
@@ -189,6 +187,7 @@ export function useActions<T extends IState>(
             ...s,
             name,
             position,
+            placed: true,
             positions: [...Array(s.size)].map((it, idx) =>
               s.direction === ShipDirection.Vertical
                 ? {
@@ -209,8 +208,11 @@ export function useActions<T extends IState>(
           }
         : { ...s, name };
     });
-    const players = [...playersState].map(({ type, ...p }) =>
-      type === PlayerType.Human ? { ...p, ships, type } : { ...p, type }
+    const fleet = { ...fleetState, ships, selectedShip: null };
+    const players = withGridUpdate(
+      [...playersState].map(({ type, ...p }) =>
+        type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+      )
     );
 
     return {
@@ -219,36 +221,40 @@ export function useActions<T extends IState>(
     };
   }
 
-  // TODO Clean up empty grid positions
-  function updatePlayerGrid(playersState: IPlayer[]): TAction {
-    const { fleet: fleetState, grid: gridState } = [...playersState].filter(
-      ({ type }) => type === PlayerType.Human
-    )[0];
-    const { ships: shipsState } = fleetState;
-    const updateCells = [...shipsState].reduce<ICell[]>(
-      (acc, { positions }) => {
-        return [...acc, ...positions];
-      },
-      []
-    );
-    const cells = [...gridState.cells].map(({ position, ...c }) => {
-      const uC = () =>
-        [...updateCells].filter(
-          ({ position: { x, y } }) => x === position.x && y === position.y
-        )[0];
-      const type = uC() ? uC().type : CellType.Empty;
-      return { ...c, position, type };
+  function withGridUpdate(P: IPlayer[]): IPlayer[] {
+    const players = [...P].map(({ fleet, grid: G, ...rest }) => {
+      const { ships } = fleet;
+      const shipCoords = [...ships].reduce<ICell[]>(
+        (acc, { positions }) => [...acc, ...positions],
+        []
+      );
+      const grid = [...G].reduce<ICell[]>(
+        (acc, { position: P }) => [
+          ...acc,
+          {
+            position: {
+              x: P.x,
+              y: P.y
+            },
+            type: [...shipCoords]
+              .map(({ position: { x, y } }) => `${x}-${y}`)
+              .includes(`${P.x}-${P.y}`)
+              ? [...shipCoords].filter(
+                  ({ position: { x, y } }) => `${x}-${y}` === `${P.x}-${P.y}`
+                )[0].type
+              : CellType.Empty
+          }
+        ],
+        []
+      );
+      return {
+        ...rest,
+        fleet,
+        grid
+      };
     });
-    const players = [...playersState].map(({ type, ...p }) =>
-      type === PlayerType.Human
-        ? { ...p, grid: { cells }, type }
-        : { ...p, type }
-    );
 
-    return {
-      type: PlayerActions.UpdateGridCells,
-      players
-    };
+    return players;
   }
 
   return {
@@ -257,7 +263,6 @@ export function useActions<T extends IState>(
     selectShip,
     rotateShip,
     moveShip,
-    placeShip,
-    updatePlayerGrid
+    placeShip
   };
 }
