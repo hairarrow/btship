@@ -19,6 +19,7 @@ import {
   IPosition
 } from "./Models";
 import DEFAULT_SHIPS from "../components/Ship/DefaultShips";
+import getHumanPlayer from "../lib/getHumanPlayer";
 
 export function useActions<T extends IState>(
   state: T,
@@ -88,9 +89,15 @@ export function useActions<T extends IState>(
     const { fleet: fleetState } = [...playersState].filter(
       ({ type }) => type === PlayerType.Human
     )[0];
-    const { ships } = fleetState;
-    const selectedShip = [...ships].filter(({ name }) => name === ship)[0];
-    const fleet = { ...fleetState, selectedShip };
+    const { ships: shipsState } = fleetState;
+    const selectedShip = [...shipsState].filter(({ name }) => name === ship)[0];
+    const ships = [...shipsState].map(({ name, ...rest }) => ({
+      ...rest,
+      name,
+      placed: name === ship ? false : rest.placed,
+      positions: name === ship ? [] : rest.positions
+    }));
+    const fleet = { ...fleetState, selectedShip, ships };
     const players = [...playersState].map(({ type, ...p }) =>
       type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
     );
@@ -119,8 +126,10 @@ export function useActions<T extends IState>(
         : { ...s, name, direction }
     );
     const fleet = { selectedShip, ships };
-    const players = [...playersState].map(({ type, ...p }) =>
-      type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+    const players = withGridUpdate(
+      [...playersState].map(({ type, ...p }) =>
+        type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+      )
     );
 
     return {
@@ -130,13 +139,17 @@ export function useActions<T extends IState>(
   }
 
   // TODO This is broken...
-  function checkValidCoords(grid: ICell[], P: IPosition): boolean {
+  function checkValidCoords(grid: ICell[], { x, y }: IPosition): boolean {
+    const { gridSize } = state.game;
+    const S = gridSize - 1;
     return (
-      P.x <= 9 &&
-      P.y <= 9 &&
-      grid.filter(
-        ({ position: { x, y } }) => `${x}-${y}` === `${P.x}-${P.y}`
-      )[0].type === CellType.Empty
+      x <= S &&
+      y <= S &&
+      [CellType.Empty, CellType.HoverShip].includes(
+        grid.filter(
+          ({ position: { x: X, y: Y } }) => `${X}-${Y}` === `${x}-${y}`
+        )[0].type
+      )
     );
   }
 
@@ -193,34 +206,36 @@ export function useActions<T extends IState>(
   // TODO Check valid placement
   function placeShip(ship: string, position: IPosition): TAction {
     const { players: playersState } = state;
-    const { fleet: fleetState } = [...playersState].filter(
-      ({ type }) => type === PlayerType.Human
-    )[0];
+    const { fleet: fleetState, grid } = getHumanPlayer(playersState);
     const { ships: shipsState } = fleetState;
     const ships = [...shipsState].map(({ name, ...s }) => {
+      const newPositions = [...Array(s.size)].map((it, idx) =>
+        s.direction === ShipDirection.Vertical
+          ? {
+              position: {
+                x: s.position.x,
+                y: s.position.y + idx
+              },
+              type: CellType.PendingShip
+            }
+          : {
+              position: {
+                x: s.position.x + idx,
+                y: s.position.y
+              },
+              type: CellType.PendingShip
+            }
+      );
+      const validPlacement = [...newPositions].every(({ position: { x, y } }) =>
+        checkValidCoords(grid, { x, y })
+      );
       return name === ship
         ? {
             ...s,
             name,
             position,
-            placed: true,
-            positions: [...Array(s.size)].map((it, idx) =>
-              s.direction === ShipDirection.Vertical
-                ? {
-                    position: {
-                      x: s.position.x,
-                      y: s.position.y + idx
-                    },
-                    type: CellType.PendingShip
-                  }
-                : {
-                    position: {
-                      x: s.position.x + idx,
-                      y: s.position.y
-                    },
-                    type: CellType.PendingShip
-                  }
-            )
+            placed: validPlacement,
+            positions: validPlacement ? newPositions : []
           }
         : { ...s, name };
     });
