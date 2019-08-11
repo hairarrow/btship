@@ -4,7 +4,8 @@ import {
   IActions,
   PlayerActions,
   GameActions,
-  ShipActions
+  ShipActions,
+  AIActions
 } from "./ActionsModels";
 import {
   IState,
@@ -20,6 +21,7 @@ import {
 } from "./Models";
 import DEFAULT_SHIPS from "../components/Ship/DefaultShips";
 import getHumanPlayer from "../lib/getHumanPlayer";
+import { takeTurn } from "../components/AI";
 
 export function useActions<T extends IState>(
   state: T,
@@ -81,6 +83,58 @@ export function useActions<T extends IState>(
     return {
       type: GameActions.Start,
       game
+    };
+  }
+
+  function finishPlacing(): TAction {
+    return {
+      type: GameActions.EndPlacing
+    };
+  }
+
+  const AITurn = (p: IPlayer[]): TAction => {
+    const players = withGridUpdate(takeTurn(p));
+
+    return {
+      type: AIActions.Shoot,
+      players
+    };
+  };
+
+  function endTurn(): TAction {
+    const {
+      game: { playerTurn: P }
+    } = state;
+    const playerTurn =
+      P === PlayerType.Human ? PlayerType.Computer : PlayerType.Human;
+    const game = { ...state.game, playerTurn };
+
+    return {
+      type: GameActions.EndTurn,
+      game
+    };
+  }
+
+  // TODO Check if valid shot
+  function shoot(targetPlayer: PlayerType, position: IPosition): TAction {
+    const { players: playerState } = state;
+    const { grid: G } = [...playerState].filter(
+      ({ type }) => type === targetPlayer
+    )[0];
+    const grid = [...G].map(({ ...rest }) => {
+      if (position.x === rest.position.x && position.y === rest.position.y)
+        return { ...rest, type: CellType.Miss };
+      else return { ...rest };
+    });
+    const p = [...playerState].map(p =>
+      p.type === targetPlayer ? { ...p, grid } : { ...p }
+    );
+
+    const players = withGridUpdate(takeTurn(p));
+
+    return {
+      type: PlayerActions.Shoot,
+      players
     };
   }
 
@@ -216,14 +270,14 @@ export function useActions<T extends IState>(
                 x: s.position.x,
                 y: s.position.y + idx
               },
-              type: CellType.PendingShip
+              type: CellType.Ship
             }
           : {
               position: {
                 x: s.position.x + idx,
                 y: s.position.y
               },
-              type: CellType.PendingShip
+              type: CellType.Ship
             }
       );
       const validPlacement = [...newPositions].every(({ position: { x, y } }) =>
@@ -287,9 +341,10 @@ export function useActions<T extends IState>(
         []
       );
       const grid = [...G].reduce<ICell[]>(
-        (acc, { position: P }) => [
+        (acc, { position: P, ...rest }) => [
           ...acc,
           {
+            ...rest,
             position: {
               x: P.x,
               y: P.y
@@ -300,6 +355,8 @@ export function useActions<T extends IState>(
               ? [...shipCoords].filter(
                   ({ position: { x, y } }) => `${x}-${y}` === `${P.x}-${P.y}`
                 )[0].type
+              : rest.type === CellType.Miss
+              ? CellType.Miss
               : CellType.Empty
           }
         ],
@@ -322,6 +379,9 @@ export function useActions<T extends IState>(
     rotateShip,
     moveShip,
     placeShip,
-    removeSelectedShip
+    removeSelectedShip,
+    finishPlacing,
+    shoot,
+    endTurn
   };
 }

@@ -1,21 +1,28 @@
-import React, { FC, useContext, useCallback, useState, useEffect } from "react";
+import React, { FC, useContext, useCallback } from "react";
 import StyledGridCell from "./GridCell.styled";
-import { ICell, PlayerType, CellType } from "../../state/Models";
+import { ICell, CellType, PlayerType } from "../../state/Models";
 import { ctx } from "../../App";
 import getHumanPlayer from "../../lib/getHumanPlayer";
 
-const GridCell: FC<{ cell: ICell; type: CellType }> = ({
+type TProps = {
+  cell: ICell;
+  type: CellType;
+  canBeAttacked?: boolean;
+};
+
+const GridCell: FC<TProps> = ({
   cell: {
     position: { x, y }
   },
-  type
+  type,
+  canBeAttacked
 }) => {
   const {
     state: {
       game: { placing },
       players
     },
-    actions: { moveShip, placeShip, removeSelectedShip, selectShip },
+    actions: { moveShip, placeShip, selectShip, shoot },
     dispatch
   } = useContext(ctx);
   const handleHoverEnter = useCallback(() => {
@@ -26,15 +33,15 @@ const GridCell: FC<{ cell: ICell; type: CellType }> = ({
     if (!selectedShip) return;
 
     dispatch(moveShip(selectedShip.name, { x, y }));
-  }, [placing, moveShip, players, x, y]);
+  }, [placing, moveShip, players, x, y, dispatch]);
+
   const handleClick = useCallback(() => {
     if (!placing) return;
-    console.log(x, y);
     const {
       fleet: { selectedShip, ships }
     } = getHumanPlayer(players);
 
-    if (type === CellType.PendingShip) {
+    if (type === CellType.Ship) {
       // TODO, this fails if you try to place on the same tile you picked up a ship from
       const { name } = [...ships]
         .map(({ name, positions }) => ({ name, positions }))
@@ -49,12 +56,24 @@ const GridCell: FC<{ cell: ICell; type: CellType }> = ({
     if (!selectedShip) return;
 
     dispatch(placeShip(selectedShip.name, { x, y }));
-  }, [placing, placeShip, players, x, y]);
+  }, [placing, placeShip, players, x, y, dispatch, selectShip, type]);
+
+  const handleAttackClick = useCallback(() => {
+    dispatch(shoot(PlayerType.Computer, { x, y }));
+  }, [dispatch, shoot, x, y]);
 
   // TODO useStateEffect validPlacement
   // TODO check if clicking on a placed ship, then select that ship
 
-  return (
+  return canBeAttacked ? (
+    <StyledGridCell
+      type={type}
+      onMouseEnter={handleHoverEnter}
+      onClick={handleAttackClick}
+    >
+      {type}
+    </StyledGridCell>
+  ) : (
     <StyledGridCell
       type={type}
       onMouseEnter={handleHoverEnter}

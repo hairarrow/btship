@@ -27,6 +27,7 @@ export function createCtx<T extends IState, A extends TAction>(
 
   function Provider(props: PropsWithChildren<{}>) {
     const [state, dispatch] = useReducer(reducer, defaultValue);
+
     return (
       <ctx.Provider
         value={{ state, dispatch, actions: actions(state, dispatch) }}

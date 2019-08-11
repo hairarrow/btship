@@ -2,9 +2,10 @@ import {
   TAction,
   PlayerActions,
   GameActions,
-  ShipActions
+  ShipActions,
+  AIActions
 } from "./ActionsModels";
-import { IState, PlayerType } from "./Models";
+import { IState, PlayerType, AIMode } from "./Models";
 
 export const initialState: IState = {
   stats: {
@@ -25,9 +26,13 @@ export const initialState: IState = {
     gridSize: 10,
     active: false,
     placing: false,
+    inBattle: false,
     playerTurn: PlayerType.Human
   },
-  players: []
+  players: [],
+  ai: {
+    mode: AIMode.HUNT
+  }
 };
 
 export default function reducer(
@@ -35,6 +40,16 @@ export default function reducer(
   action: TAction
 ): IState {
   switch (action.type) {
+    case AIActions.Shoot:
+      console.log(action.players);
+      return {
+        ...state,
+        game: {
+          ...state.game,
+          playerTurn: PlayerType.Human
+        },
+        players: action.players
+      };
     case PlayerActions.Create:
       return {
         ...state,
@@ -44,6 +59,7 @@ export default function reducer(
     case ShipActions.Rotate:
     case PlayerActions.SelectShip:
     case PlayerActions.UpdateGridCells:
+    case PlayerActions.Shoot:
       return {
         ...state,
         players: action.players
@@ -57,6 +73,24 @@ export default function reducer(
           active: action.game.active
         }
       };
+    case GameActions.EndPlacing:
+      return {
+        ...state,
+        game: {
+          ...state.game,
+          placing: false,
+          inBattle: true
+        }
+      };
+    case GameActions.EndTurn:
+      return {
+        ...state,
+        game: {
+          ...state.game,
+          playerTurn: action.game.playerTurn
+        }
+      };
+
     default:
       return { ...state };
   }

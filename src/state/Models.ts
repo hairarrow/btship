@@ -1,3 +1,8 @@
+export enum AIMode {
+  HUNT,
+  TARGET
+}
+
 export enum PlayerType {
   Human = "HUMAN",
   Computer = "AI",
@@ -10,7 +15,6 @@ export enum CellType {
   Ship,
   Hit,
   Sunk,
-  PendingShip,
   HoverShip,
   InvalidLocation
 }
@@ -75,11 +79,17 @@ export interface IGame {
   gridSize: number;
   active: boolean;
   placing: boolean;
+  inBattle: boolean;
   playerTurn: PlayerType;
+}
+
+export interface IAI {
+  mode: AIMode;
 }
 
 export interface IState {
   stats: IStats;
   game: IGame;
+  ai: IAI;
   players: IPlayer[];
 }

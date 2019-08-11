@@ -14,7 +14,7 @@ const Game: FC = () => {
 
   useEffect(() => {
     if (!active) dispatch(startGame());
-  }, []);
+  }, [dispatch, active, startGame]);
 
   return active ? <Board /> : <StartScreen />;
 };

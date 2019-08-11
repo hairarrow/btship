@@ -1,5 +1,4 @@
 import { PlayerType, IPosition, IPlayer, IGame } from "./Models";
-import { Dispatch } from "react";
 
 export enum GameActions {
   Start = "GAME_START",
@@ -7,9 +6,9 @@ export enum GameActions {
   Reset = "GAME_RESET",
   Won = "GAME_WON",
   Lost = "GAME_LOST",
-  Shoot = "GAME_SHOOT",
   StartPlacing = "GAME_START_PLACING",
-  EndPlacing = "GAME_END_PLACING"
+  EndPlacing = "GAME_END_PLACING",
+  EndTurn = "GAME_END_TURN"
 }
 
 export enum ShipActions {
@@ -24,23 +23,34 @@ export enum ShipActions {
 export enum PlayerActions {
   Create = "CREATE_PLAYER",
   UpdateGridCells = "UPDATE_PLAYER_CELLS",
-  SelectShip = "SELECT_SHIP"
+  SelectShip = "SELECT_SHIP",
+  Shoot = "PLAYER_SHOOT"
 }
 
+export enum AIActions {
+  Shoot = "AI_SHOOT"
+}
+
+// TODO Don't do this. Be specific about the states that change... OR ELSE...
 export type TAction =
-  | { type: GameActions.Start; game: IGame }
-  | { type: GameActions.Shoot; targetPlayer: PlayerType; position: IPosition }
+  | { type: GameActions.Start | GameActions.EndTurn; game: IGame }
   | { type: PlayerActions.Create; player: IPlayer }
   | {
       type:
+        | AIActions.Shoot
         | PlayerActions.SelectShip
         | PlayerActions.UpdateGridCells
+        | PlayerActions.Shoot
         | ShipActions.Rotate
         | ShipActions.UpdateCoords;
       players: IPlayer[];
     }
   | {
-      type: ShipActions.CheckPlacement | ShipActions.Hit | ShipActions.Sink;
+      type:
+        | ShipActions.CheckPlacement
+        | ShipActions.Hit
+        | ShipActions.Sink
+        | GameActions.EndPlacing;
     };
 
 export interface IActions {
@@ -51,4 +61,7 @@ export interface IActions {
   moveShip(p: string, position: IPosition): TAction;
   placeShip(p: string, position: IPosition): TAction;
   removeSelectedShip(): TAction;
+  finishPlacing(): TAction;
+  shoot(targetPlayer: PlayerType, position: IPosition): TAction;
+  endTurn(): TAction;
 }

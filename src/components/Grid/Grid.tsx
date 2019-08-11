@@ -1,10 +1,14 @@
-import React, { useContext, FC, useEffect, useState } from "react";
+import React, { useContext, FC } from "react";
 import { ctx } from "../../App";
 import StyledGrid from "./Grid.styled";
 import GridCell from "../GridCell";
 import { ICell } from "../../state/Models";
 
-const Grid: FC<{ grid: ICell[] }> = ({ grid }) => {
+type TProps = {
+  grid: ICell[];
+  canBeAttacked?: boolean;
+};
+const Grid: FC<TProps> = ({ grid, canBeAttacked }) => {
   const {
     state: {
       game: { gridSize }
@@ -23,6 +27,7 @@ const Grid: FC<{ grid: ICell[] }> = ({ grid }) => {
           key={`${cell.position.x}${cell.position.y}`}
           cell={cell}
           type={cell.type}
+          canBeAttacked={canBeAttacked}
         />
       ))}
     </StyledGrid>

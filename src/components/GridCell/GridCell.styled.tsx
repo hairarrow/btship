@@ -17,8 +17,6 @@ function cellBackground(type: CellType): string {
       return "#fff";
     case CellType.HoverShip:
       return "lightgreen";
-    case CellType.PendingShip:
-      return "green";
     case CellType.Empty:
     default:
       return "lightblue";
