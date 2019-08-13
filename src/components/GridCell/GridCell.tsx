@@ -79,7 +79,7 @@ const GridCell: FC<TProps> = ({
       onMouseEnter={handleHoverEnter}
       onClick={handleClick}
     >
-      {type}
+      {type}-{x}-{y}
     </StyledGridCell>
   );
 };

@@ -26,6 +26,12 @@ const Fleet: FC<{ player: string }> = ({ player }) => {
       >
         Place
       </button>
+      {/* <button
+        // disabled={![...ships].every(({ placed }) => placed)}
+        onClick={() => dispatch(finishPlacing())}
+      >
+        Place Randomly
+      </button> */}
       <h2>Fleet</h2>
       <ul>
         {ships.map(({ name, size, placed }) => (

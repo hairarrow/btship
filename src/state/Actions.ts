@@ -92,6 +92,8 @@ export function useActions<T extends IState>(
     };
   }
 
+  function placeRandomly() {}
+
   const AITurn = (p: IPlayer[]): TAction => {
     const players = withGridUpdate(takeTurn(p));
 
@@ -123,14 +125,20 @@ export function useActions<T extends IState>(
     )[0];
     const grid = [...G].map(({ ...rest }) => {
       if (position.x === rest.position.x && position.y === rest.position.y)
-        return { ...rest, type: CellType.Miss };
+        return {
+          ...rest,
+          type: rest.type === CellType.Ship ? CellType.Hit : CellType.Miss
+        };
       else return { ...rest };
     });
     const p = [...playerState].map(p =>
       p.type === targetPlayer ? { ...p, grid } : { ...p }
     );
 
-    const players = withGridUpdate(takeTurn(p));
+    // const players = withGridUpdate(takeTurn(p));
+    const aiTurn = takeTurn(p);
+
+    const players = withGridUpdate(aiTurn);
 
     return {
       type: PlayerActions.Shoot,
@@ -340,8 +348,8 @@ export function useActions<T extends IState>(
         (acc, { positions }) => [...acc, ...positions],
         []
       );
-      const grid = [...G].reduce<ICell[]>(
-        (acc, { position: P, ...rest }) => [
+      const grid = [...G].reduce<ICell[]>((acc, { position: P, ...rest }) => {
+        return [
           ...acc,
           {
             ...rest,
@@ -355,13 +363,14 @@ export function useActions<T extends IState>(
               ? [...shipCoords].filter(
                   ({ position: { x, y } }) => `${x}-${y}` === `${P.x}-${P.y}`
                 )[0].type
-              : rest.type === CellType.Miss
-              ? CellType.Miss
+              : rest.type === CellType.Miss ||
+                rest.type === CellType.Hit ||
+                rest.type === CellType.Sunk
+              ? rest.type
               : CellType.Empty
           }
-        ],
-        []
-      );
+        ];
+      }, []);
       return {
         ...rest,
         fleet,

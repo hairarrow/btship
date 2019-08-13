@@ -10,13 +10,13 @@ export enum PlayerType {
 }
 
 export enum CellType {
-  Empty,
-  Miss,
-  Ship,
-  Hit,
-  Sunk,
-  HoverShip,
-  InvalidLocation
+  Empty = "EMPTY",
+  Miss = "MISS",
+  Ship = "SHIP",
+  Hit = "HIT",
+  Sunk = "SUNK",
+  HoverShip = "HOVER",
+  InvalidLocation = "INVALID"
 }
 
 export enum ShipDirection {

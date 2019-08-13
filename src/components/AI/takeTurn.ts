@@ -130,7 +130,6 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
     (it, i) => i % 2 && it.type === CellType.Empty
   );
 
-  console.log(availableShots);
   const shot = [...availableShots].sort(
     (a, b) => b.probability - a.probability
   )[0];
@@ -144,10 +143,25 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
     return it;
   });
 
+  const fleetShips = [...humanFleet].map(it => {
+    const positions = [...it.positions].map(pos => {
+      if (
+        shot.position.x === pos.position.x &&
+        shot.position.y === pos.position.y
+      )
+        return { ...pos, type: CellType.Hit };
+      return pos;
+    });
+
+    return { ...it, positions };
+  });
+
   console.log(grid);
 
   const players = [...playersState].map(it =>
-    it.type === PlayerType.Human ? { ...it, grid } : it
+    it.type === PlayerType.Human
+      ? { ...it, grid, fleet: { ...it.fleet, ships: fleetShips } }
+      : it
   );
   return players;
 }
