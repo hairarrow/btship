@@ -344,7 +344,18 @@ export function useActions<T extends IState>(
   function withGridUpdate(P: IPlayer[]): IPlayer[] {
     const players = [...P].map(({ fleet, grid: G, ...rest }) => {
       const { ships } = fleet;
-      const shipCoords = [...ships].reduce<ICell[]>(
+      const fleetShips = [...ships].map(it => {
+        const sunk = [...it.positions].every(p => p.type === CellType.Hit);
+        return {
+          ...it,
+          sunk,
+          positions: [...it.positions].map(p => ({
+            ...p,
+            type: sunk ? CellType.Sunk : p.type
+          }))
+        };
+      });
+      const shipCoords = [...fleetShips].reduce<ICell[]>(
         (acc, { positions }) => [...acc, ...positions],
         []
       );
@@ -373,7 +384,10 @@ export function useActions<T extends IState>(
       }, []);
       return {
         ...rest,
-        fleet,
+        fleet: {
+          ...fleet,
+          ships: fleetShips
+        },
         grid
       };
     });
