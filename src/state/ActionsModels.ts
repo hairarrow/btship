@@ -24,7 +24,8 @@ export enum PlayerActions {
   Create = "CREATE_PLAYER",
   UpdateGridCells = "UPDATE_PLAYER_CELLS",
   SelectShip = "SELECT_SHIP",
-  Shoot = "PLAYER_SHOOT"
+  Shoot = "PLAYER_SHOOT",
+  PlaceAutomatically = "PLAYER_PLACE_AUTOMATICALLY"
 }
 
 export enum AIActions {
@@ -41,6 +42,7 @@ export type TAction =
         | PlayerActions.SelectShip
         | PlayerActions.UpdateGridCells
         | PlayerActions.Shoot
+        | PlayerActions.PlaceAutomatically
         | ShipActions.Rotate
         | ShipActions.UpdateCoords;
       players: IPlayer[];
@@ -59,9 +61,10 @@ export interface IActions {
   selectShip(p: string): TAction;
   rotateShip(): TAction;
   moveShip(p: string, position: IPosition): TAction;
-  placeShip(p: string, position: IPosition): TAction;
+  manualPlaceShip(p: string, position: IPosition): TAction;
   removeSelectedShip(): TAction;
   finishPlacing(): TAction;
   shoot(targetPlayer: PlayerType, position: IPosition): TAction;
   endTurn(): TAction;
+  placeAutomatically(): TAction;
 }

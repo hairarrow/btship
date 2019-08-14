@@ -7,7 +7,6 @@ import {
 } from "../../state/Models";
 import getHumanPlayer from "../../lib/getHumanPlayer";
 import createSegments from "./createSegments";
-import { Z_FILTERED } from "zlib";
 
 type TSegment = {
   start: IPosition;
@@ -41,10 +40,12 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
   if (aiMode === AIMode.TARGET) {
     const hits = [...hiddenGrid].filter(it => it.type === CellType.Hit);
     const neighborCells = [...hiddenGrid].filter(cell =>
-      [...hits].some(hit => {
-        if (cell.position.x <= 9 && cell.position.y <= 9) {
+      [...hits].some(
+        (hit): boolean => {
           return (
             cell.type === CellType.Empty &&
+            cell.position.x <= 9 &&
+            cell.position.y <= 9 &&
             (cell.position.x === hit.position.x ||
               cell.position.y === hit.position.y) &&
             (cell.position.y === hit.position.y + 1 ||
@@ -53,13 +54,13 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
               cell.position.x === hit.position.x - 1)
           );
         }
-      })
+      )
     );
 
     console.log(segments);
     const possibleSegments = [...segments].filter(
       it =>
-        ((it.start.x === it.end.x || it.start.y === it.start.y) &&
+        ((it.start.x === it.end.x || it.start.y === it.end.y) &&
           neighborCells.some(c => c.position.x === it.start.x)) ||
         neighborCells.some(c => c.position.y === it.start.y)
     );
@@ -79,7 +80,9 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
             else {
               coords[xy] = coords[xy] + 1;
             }
+            return null;
           });
+          return null;
         });
       }
 

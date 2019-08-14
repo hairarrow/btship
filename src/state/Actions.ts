@@ -4,8 +4,7 @@ import {
   IActions,
   PlayerActions,
   GameActions,
-  ShipActions,
-  AIActions
+  ShipActions
 } from "./ActionsModels";
 import {
   IState,
@@ -22,6 +21,11 @@ import {
 import DEFAULT_SHIPS from "../components/Ship/DefaultShips";
 import getHumanPlayer from "../lib/getHumanPlayer";
 import { takeTurn } from "../components/AI";
+import {
+  isLegal,
+  placeShip,
+  placeShipOnGrid
+} from "../components/Ship/ShipActions";
 
 export function useActions<T extends IState>(
   state: T,
@@ -92,16 +96,60 @@ export function useActions<T extends IState>(
     };
   }
 
-  function placeRandomly() {}
+  function placeAutomatically(): TAction {
+    const { players: playerState, game } = state;
+    const {
+      fleet: { ships: shipsState },
+      grid: GRID
+    } = getHumanPlayer(playerState);
+    let grid = [...GRID];
+    const ships = [...shipsState].map(ship => {
+      let illegalPlacement = true;
+      let newShip: IShip = ship;
 
-  const AITurn = (p: IPlayer[]): TAction => {
-    const players = withGridUpdate(takeTurn(p));
+      while (illegalPlacement) {
+        const x = Math.floor(game.gridSize * Math.random());
+        const y = Math.floor(game.gridSize * Math.random());
+        const direction = Math.floor(2 * Math.random());
+        const obj = {
+          ship,
+          direction,
+          grid,
+          position: { x, y },
+          player: PlayerType.Human,
+          gridSize: game.gridSize
+        };
+
+        if (isLegal(obj)) {
+          newShip = placeShip(obj);
+          grid = placeShipOnGrid({ ...obj, ship: newShip });
+          illegalPlacement = false;
+        }
+      }
+
+      return newShip;
+    });
+
+    const updatePlayer = { grid, ships };
+    const players = withGridUpdate(
+      [...playerState].map(it =>
+        it.type === PlayerType.Human ? { ...it, ...updatePlayer } : it
+      )
+    );
 
     return {
-      type: AIActions.Shoot,
+      type: PlayerActions.PlaceAutomatically,
       players
     };
-  };
+  }
+
+  // const AITurn = (p: IPlayer[]): TAction => {
+  //   const players = withGridUpdate(takeTurn(p));
+  //   return {
+  //     type: AIActions.Shoot,
+  //     players
+  //   };
+  // };
 
   function endTurn(): TAction {
     const {
@@ -160,8 +208,10 @@ export function useActions<T extends IState>(
       positions: name === ship ? [] : rest.positions
     }));
     const fleet = { ...fleetState, selectedShip, ships };
-    const players = [...playersState].map(({ type, ...p }) =>
-      type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+    const players = withGridUpdate(
+      [...playersState].map(({ type, ...p }) =>
+        type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+      )
     );
 
     return {
@@ -265,46 +315,39 @@ export function useActions<T extends IState>(
     };
   }
 
-  // TODO Check valid placement
-  function placeShip(ship: string, position: IPosition): TAction {
-    const { players: playersState } = state;
+  function manualPlaceShip(shipName: string, position: IPosition): TAction {
+    const {
+      players: playersState,
+      game: { gridSize }
+    } = state;
     const { fleet: fleetState, grid } = getHumanPlayer(playersState);
     const { ships: shipsState } = fleetState;
-    const ships = [...shipsState].map(({ name, ...s }) => {
-      const newPositions = [...Array(s.size)].map((it, idx) =>
-        s.direction === ShipDirection.Vertical
-          ? {
-              position: {
-                x: s.position.x,
-                y: s.position.y + idx
-              },
-              type: CellType.Ship
-            }
-          : {
-              position: {
-                x: s.position.x + idx,
-                y: s.position.y
-              },
-              type: CellType.Ship
-            }
-      );
-      const validPlacement = [...newPositions].every(({ position: { x, y } }) =>
-        checkValidCoords(grid, { x, y })
-      );
-      return name === ship
-        ? {
-            ...s,
-            name,
-            position,
-            placed: validPlacement,
-            positions: validPlacement ? newPositions : []
-          }
-        : { ...s, name };
-    });
-    const fleet = { ...fleetState, ships, selectedShip: null };
+    let ship = [...shipsState].filter(it => it.name === shipName)[0];
+    const obj = {
+      ship,
+      grid,
+      position,
+      gridSize,
+      player: PlayerType.Human,
+      direction: ship.direction
+    };
+
+    if (isLegal(obj)) {
+      ship = placeShip(obj);
+    }
+
+    const ships = [...shipsState].map(it => (it.name === shipName ? ship : it));
     const players = withGridUpdate(
-      [...playersState].map(({ type, ...p }) =>
-        type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+      [...playersState].map(it =>
+        it.type === PlayerType.Human
+          ? {
+              ...it,
+              fleet: {
+                selectedShip: null,
+                ships
+              }
+            }
+          : it
       )
     );
 
@@ -376,7 +419,8 @@ export function useActions<T extends IState>(
                 )[0].type
               : rest.type === CellType.Miss ||
                 rest.type === CellType.Hit ||
-                rest.type === CellType.Sunk
+                rest.type === CellType.Sunk ||
+                rest.type === CellType.Ship
               ? rest.type
               : CellType.Empty
           }
@@ -401,10 +445,11 @@ export function useActions<T extends IState>(
     selectShip,
     rotateShip,
     moveShip,
-    placeShip,
+    manualPlaceShip,
     removeSelectedShip,
     finishPlacing,
     shoot,
-    endTurn
+    endTurn,
+    placeAutomatically
   };
 }

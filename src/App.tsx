@@ -4,6 +4,8 @@ import reducer, { initialState } from "./state/Reducer";
 import { IState } from "./state/Models";
 import Game from "./components/Game";
 import { TAction } from "./state/ActionsModels";
+import { ThemeProvider } from "styled-components";
+import theme from "./theme";
 
 export const [ctx, StateProvider] = createCtx<IState, TAction>(
   initialState,
@@ -13,7 +15,9 @@ export const [ctx, StateProvider] = createCtx<IState, TAction>(
 const App: FC = () => {
   return (
     <StateProvider>
-      <Game />
+      <ThemeProvider theme={theme}>
+        <Game />
+      </ThemeProvider>
     </StateProvider>
   );
 };

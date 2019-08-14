@@ -1,33 +1,70 @@
-import styled from "styled-components";
+import styled, { DefaultTheme } from "styled-components";
 import { CellType } from "../../state/Models";
 
 interface IProps {
   readonly type: CellType;
+  readonly height: number;
 }
 
-function cellBackground(type: CellType): string {
+function cellBackground(type: CellType | "odd", theme: DefaultTheme): string {
   switch (type) {
     case CellType.Sunk:
       return "#000";
     case CellType.Ship:
-      return "#999";
+      return theme.colors.main;
     case CellType.Hit:
-      return "red";
+      return theme.colors.accent;
     case CellType.Miss:
-      return "#fff";
+      return "rgba(255, 255, 255, 0.8)";
     case CellType.HoverShip:
-      return "lightgreen";
+      return "rgba(0, 0, 0, 0.2)";
+    case "odd":
+      return "rgba(255, 255, 255, 0.2)";
     case CellType.Empty:
     default:
-      return "lightblue";
+      return "rgba(255, 255, 255, 0.3)";
   }
 }
 
 const Component = styled.div<IProps>`
   position: relative;
-  height: 30px;
-  border: 1px solid #000;
-  background: ${({ type }) => cellBackground(type)};
+  height: ${({ height }) => `${height}px`}
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: ${({ theme: { colors } }) => colors.main}
+  background: ${({ type, theme }) => cellBackground(type, theme)};
+  z-index: 1000;
+
+  &:nth-child(20n+2),
+  &:nth-child(20n+4),
+  &:nth-child(20n+6),
+  &:nth-child(20n+8),
+  &:nth-child(20n+10),
+  &:nth-child(20n+11),
+  &:nth-child(20n+13),
+  &:nth-child(20n+15),
+  &:nth-child(20n+17),
+  &:nth-child(20n+19) {
+    background: ${({ type, theme }) =>
+      type === CellType.Empty
+        ? cellBackground("odd", theme)
+        : cellBackground(type, theme)};
+  }
+
+  &:nth-child(1) {
+    border-top-left-radius: 8px;
+  }
+
+  &:nth-child(10) {
+    border-top-right-radius: 8px;
+  }
+
+  &:nth-child(91) {
+    border-bottom-left-radius: 8px;
+  }
+
+  &:nth-child(100) {
+    border-bottom-right-radius: 8px;
+  }
 
   &:hover:after {
     content: "";

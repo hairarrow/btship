@@ -1,4 +1,11 @@
-import React, { FC, useContext, useCallback } from "react";
+import React, {
+  FC,
+  useContext,
+  useCallback,
+  useRef,
+  useState,
+  useEffect
+} from "react";
 import StyledGridCell from "./GridCell.styled";
 import { ICell, CellType, PlayerType } from "../../state/Models";
 import { ctx } from "../../App";
@@ -17,12 +24,20 @@ const GridCell: FC<TProps> = ({
   type,
   canBeAttacked
 }) => {
+  const [height, setHeight] = useState(0);
+  const cellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (cellRef.current)
+      setHeight(cellRef.current.getBoundingClientRect().width);
+  }, []);
+
   const {
     state: {
       game: { placing },
       players
     },
-    actions: { moveShip, placeShip, selectShip, shoot },
+    actions: { moveShip, manualPlaceShip: placeShip, selectShip, shoot },
     dispatch
   } = useContext(ctx);
   const handleHoverEnter = useCallback(() => {
@@ -65,22 +80,14 @@ const GridCell: FC<TProps> = ({
   // TODO useStateEffect validPlacement
   // TODO check if clicking on a placed ship, then select that ship
 
-  return canBeAttacked ? (
+  return (
     <StyledGridCell
       type={type}
       onMouseEnter={handleHoverEnter}
-      onClick={handleAttackClick}
-    >
-      {type}
-    </StyledGridCell>
-  ) : (
-    <StyledGridCell
-      type={type}
-      onMouseEnter={handleHoverEnter}
-      onClick={handleClick}
-    >
-      {x}-{y}
-    </StyledGridCell>
+      onClick={canBeAttacked ? handleAttackClick : handleClick}
+      ref={cellRef}
+      height={height}
+    />
   );
 };
 

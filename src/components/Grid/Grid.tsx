@@ -21,6 +21,7 @@ const Grid: FC<TProps> = ({ grid, canBeAttacked }) => {
     <StyledGrid
       gridSize={gridSize}
       onMouseLeave={() => dispatch(removeSelectedShip())}
+      onMouseEnter={() => console.log("enter")}
     >
       {grid.map(cell => (
         <GridCell

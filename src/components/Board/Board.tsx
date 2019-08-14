@@ -5,6 +5,7 @@ import Grid from "../Grid";
 import Fleet from "../Fleet";
 import getHumanPlayer from "../../lib/getHumanPlayer";
 import getAIPlayer from "../../lib/getAIPlayer";
+import BoardContainer from "./Board.styled";
 
 const Board: FC = () => {
   const {
@@ -15,13 +16,13 @@ const Board: FC = () => {
   } = useContext(ctx);
 
   return placing ? (
-    <section>
+    <BoardContainer>
       <h1>Place your ships!</h1>
       <Grid grid={getHumanPlayer(players).grid} />
       <Fleet player={PlayerType.Human} />
-    </section>
+    </BoardContainer>
   ) : (
-    <div>
+    <BoardContainer>
       <Grid grid={getHumanPlayer(players).grid} />
 
       <h1>Sink the Ships!</h1>
@@ -31,7 +32,7 @@ const Board: FC = () => {
         grid={getAIPlayer(players).grid}
         canBeAttacked={playerTurn === PlayerType.Human}
       />
-    </div>
+    </BoardContainer>
   );
 };
 
