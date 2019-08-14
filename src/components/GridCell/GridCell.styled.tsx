@@ -4,6 +4,7 @@ import { CellType } from "../../state/Models";
 interface IProps {
   readonly type: CellType;
   readonly height: number;
+  readonly canBeAttacked?: boolean;
 }
 
 function cellBackground(type: CellType | "odd", theme: DefaultTheme): string {
@@ -33,6 +34,7 @@ const Component = styled.div<IProps>`
   color: ${({ theme: { colors } }) => colors.main}
   background: ${({ type, theme }) => cellBackground(type, theme)};
   z-index: 1000;
+  cursor: ${({ canBeAttacked }) => canBeAttacked && "pointer"}
 
   &:nth-child(20n+2),
   &:nth-child(20n+4),

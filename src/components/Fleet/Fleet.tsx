@@ -1,5 +1,6 @@
 import React, { FC, useContext } from "react";
 import { ctx } from "../../App";
+import { PlayerType } from "../../state/Models";
 
 const Fleet: FC<{ player: string }> = ({ player }) => {
   const {
@@ -22,14 +23,14 @@ const Fleet: FC<{ player: string }> = ({ player }) => {
       )}
       <button
         disabled={![...ships].every(({ placed }) => placed)}
-        onClick={() => dispatch(finishPlacing())}
+        onClick={() => {
+          dispatch(placeAutomatically(PlayerType.Computer));
+          dispatch(finishPlacing());
+        }}
       >
-        Place
+        Start the Battle
       </button>
-      <button
-        disabled={![...ships].every(({ placed }) => !placed)}
-        onClick={() => dispatch(placeAutomatically())}
-      >
+      <button onClick={() => dispatch(placeAutomatically(PlayerType.Human))}>
         Place Randomly
       </button>
       <h2>Fleet</h2>

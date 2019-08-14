@@ -74,6 +74,7 @@ const GridCell: FC<TProps> = ({
   }, [placing, placeShip, players, x, y, dispatch, selectShip, type]);
 
   const handleAttackClick = useCallback(() => {
+    console.log(x, y);
     dispatch(shoot(PlayerType.Computer, { x, y }));
   }, [dispatch, shoot, x, y]);
 

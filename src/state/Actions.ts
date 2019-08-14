@@ -24,7 +24,7 @@ import { takeTurn } from "../components/AI";
 import {
   isLegal,
   placeShip,
-  placeShipOnGrid
+  randomPlacements
 } from "../components/Ship/ShipActions";
 
 export function useActions<T extends IState>(
@@ -96,46 +96,8 @@ export function useActions<T extends IState>(
     };
   }
 
-  function placeAutomatically(): TAction {
-    const { players: playerState, game } = state;
-    const {
-      fleet: { ships: shipsState },
-      grid: GRID
-    } = getHumanPlayer(playerState);
-    let grid = [...GRID];
-    const ships = [...shipsState].map(ship => {
-      let illegalPlacement = true;
-      let newShip: IShip = ship;
-
-      while (illegalPlacement) {
-        const x = Math.floor(game.gridSize * Math.random());
-        const y = Math.floor(game.gridSize * Math.random());
-        const direction = Math.floor(2 * Math.random());
-        const obj = {
-          ship,
-          direction,
-          grid,
-          position: { x, y },
-          player: PlayerType.Human,
-          gridSize: game.gridSize
-        };
-
-        if (isLegal(obj)) {
-          newShip = placeShip(obj);
-          grid = placeShipOnGrid({ ...obj, ship: newShip });
-          illegalPlacement = false;
-        }
-      }
-
-      return newShip;
-    });
-
-    const updatePlayer = { grid, ships };
-    const players = withGridUpdate(
-      [...playerState].map(it =>
-        it.type === PlayerType.Human ? { ...it, ...updatePlayer } : it
-      )
-    );
+  function placeAutomatically(player: PlayerType): TAction {
+    const players = withGridUpdate(randomPlacements(state, player));
 
     return {
       type: PlayerActions.PlaceAutomatically,
@@ -164,20 +126,21 @@ export function useActions<T extends IState>(
       ({ type }) => type === targetPlayer
     )[0];
     const grid = [...G].map(({ ...rest }) => {
-      if (position.x === rest.position.x && position.y === rest.position.y)
+      if (position.x === rest.position.x && position.y === rest.position.y) {
+        console.log(rest.type);
         return {
           ...rest,
           type: rest.type === CellType.Ship ? CellType.Hit : CellType.Miss
         };
-      else return { ...rest };
+      } else return { ...rest };
     });
     const p = [...playerState].map(p =>
       p.type === targetPlayer ? { ...p, grid } : { ...p }
     );
 
-    // const players = withGridUpdate(takeTurn(p));
+    console.log(targetPlayer === PlayerType.Computer);
+    // TODO Shooting the computer doesn't work!
     const aiTurn = takeTurn(p);
-
     const players = withGridUpdate(aiTurn);
 
     return {
@@ -242,21 +205,6 @@ export function useActions<T extends IState>(
     };
   }
 
-  // TODO This is broken...
-  function checkValidCoords(grid: ICell[], { x, y }: IPosition): boolean {
-    const { gridSize } = state.game;
-    const S = gridSize - 1;
-    return (
-      x <= S &&
-      y <= S &&
-      [CellType.Empty, CellType.HoverShip].includes(
-        grid.filter(
-          ({ position: { x: X, y: Y } }) => `${X}-${Y}` === `${x}-${y}`
-        )[0].type
-      )
-    );
-  }
-
   function moveShip(shipName: string, position: IPosition): TAction {
     const {
       players: playersState,
@@ -311,10 +259,11 @@ export function useActions<T extends IState>(
       player: PlayerType.Human,
       direction: ship.direction
     };
+    const legalPlacement = isLegal(obj);
 
-    if (isLegal(obj)) {
-      ship = placeShip(obj);
-    }
+    ship = legalPlacement
+      ? placeShip(obj)
+      : { ...ship, placed: false, positions: [] };
 
     const ships = [...shipsState].map(it => (it.name === shipName ? ship : it));
     const players = withGridUpdate(
@@ -323,7 +272,7 @@ export function useActions<T extends IState>(
           ? {
               ...it,
               fleet: {
-                selectedShip: null,
+                selectedShip: legalPlacement ? null : it.fleet.selectedShip,
                 ships
               }
             }
@@ -399,8 +348,7 @@ export function useActions<T extends IState>(
                 )[0].type
               : rest.type === CellType.Miss ||
                 rest.type === CellType.Hit ||
-                rest.type === CellType.Sunk ||
-                rest.type === CellType.Ship
+                rest.type === CellType.Sunk
               ? rest.type
               : CellType.Empty
           }

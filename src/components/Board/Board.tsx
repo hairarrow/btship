@@ -15,6 +15,7 @@ const Board: FC = () => {
     }
   } = useContext(ctx);
 
+  console.log("update");
   return placing ? (
     <BoardContainer>
       <h1>Place your ships!</h1>
@@ -25,8 +26,7 @@ const Board: FC = () => {
     <BoardContainer>
       <Grid grid={getHumanPlayer(players).grid} />
 
-      <h1>Sink the Ships!</h1>
-      <h3>Turn: {playerTurn}</h3>
+      <h2>Sink the Ships!</h2>
 
       <Grid
         grid={getAIPlayer(players).grid}

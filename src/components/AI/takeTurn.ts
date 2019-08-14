@@ -14,10 +14,6 @@ type TSegment = {
   size?: number;
 };
 
-type TSegments = {
-  [k: string]: TSegment[];
-};
-
 // TODO BREAK THIS UP
 export function takeTurn(playersState: IPlayer[]): IPlayer[] {
   const humanGrid = getHumanPlayer(playersState).grid;
@@ -36,7 +32,6 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
     : AIMode.HUNT;
   const segments = createSegments(hiddenGrid, smallestShipSize);
 
-  console.log(aiMode === AIMode.TARGET);
   if (aiMode === AIMode.TARGET) {
     const hits = [...hiddenGrid].filter(it => it.type === CellType.Hit);
     const neighborCells = [...hiddenGrid].filter(cell =>
@@ -92,7 +87,6 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
     // TODO add additional weight to conseq hits
 
     const shot = [...neighborCells][0];
-    console.log(probs);
     const s = [...neighborCells].map(it => ({
       ...it,
       probability: probs[`${it.position.x}${it.position.y}`] || 0
@@ -199,7 +193,12 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
     const players = [...playersState].map(it =>
       it.type === PlayerType.Human
         ? { ...it, grid, fleet: { ...it.fleet, ships: fleetShips } }
-        : it
+        : {
+            ...it,
+            grid: playersState.filter(
+              ({ type }) => type === PlayerType.Computer
+            )[0].grid
+          }
     );
     return players;
   }

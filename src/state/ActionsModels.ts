@@ -66,5 +66,5 @@ export interface IActions {
   finishPlacing(): TAction;
   shoot(targetPlayer: PlayerType, position: IPosition): TAction;
   endTurn(): TAction;
-  placeAutomatically(): TAction;
+  placeAutomatically(p: PlayerType): TAction;
 }

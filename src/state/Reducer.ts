@@ -41,28 +41,20 @@ export default function reducer(
 ): IState {
   switch (action.type) {
     case AIActions.Shoot:
-      console.log(action.players);
+    case ShipActions.UpdateCoords:
+    case ShipActions.Rotate:
+    case PlayerActions.SelectShip:
+    case PlayerActions.UpdateGridCells:
+    case PlayerActions.PlaceAutomatically:
+    case PlayerActions.Shoot:
       return {
         ...state,
-        game: {
-          ...state.game,
-          playerTurn: PlayerType.Human
-        },
         players: action.players
       };
     case PlayerActions.Create:
       return {
         ...state,
         players: [...state.players, action.player]
-      };
-    case ShipActions.UpdateCoords:
-    case ShipActions.Rotate:
-    case PlayerActions.SelectShip:
-    case PlayerActions.UpdateGridCells:
-    case PlayerActions.Shoot:
-      return {
-        ...state,
-        players: action.players
       };
     case GameActions.Start:
       return {
@@ -80,14 +72,6 @@ export default function reducer(
           ...state.game,
           placing: false,
           inBattle: true
-        }
-      };
-    case GameActions.EndTurn:
-      return {
-        ...state,
-        game: {
-          ...state.game,
-          playerTurn: action.game.playerTurn
         }
       };
 

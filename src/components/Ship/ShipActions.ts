@@ -4,7 +4,9 @@ import {
   ShipDirection,
   PlayerType,
   CellType,
-  ICell
+  ICell,
+  IState,
+  IPlayer
 } from "../../state/Models";
 
 type TParams = {
@@ -15,6 +17,48 @@ type TParams = {
   gridSize: number;
   grid: ICell[];
 };
+
+export function randomPlacements(state: IState, player: PlayerType): IPlayer[] {
+  const { players: playerState, game } = state;
+  const {
+    fleet: { ships: shipsState },
+    grid: GRID
+  } = [...playerState].filter(it => it.type === player)[0];
+  let grid = [...GRID];
+  const ships = [...shipsState].map(ship => {
+    let illegalPlacement = true;
+    let newShip: IShip = ship;
+
+    while (illegalPlacement) {
+      const x = Math.floor(game.gridSize * Math.random());
+      const y = Math.floor(game.gridSize * Math.random());
+      const direction = Math.floor(2 * Math.random());
+      const obj = {
+        ship,
+        direction,
+        grid,
+        player,
+        position: { x, y },
+        gridSize: game.gridSize
+      };
+
+      if (isLegal(obj)) {
+        newShip = placeShip(obj);
+        grid = placeShipOnGrid({ ...obj, ship: newShip });
+        illegalPlacement = false;
+      }
+    }
+
+    return newShip;
+  });
+
+  const updatePlayer = { grid, ships };
+  const players = [...playerState].map(it =>
+    it.type === player ? { ...it, ...updatePlayer } : it
+  );
+
+  return players;
+}
 
 export function placeShip(obj: TParams, hover = false): IShip {
   const {
@@ -37,7 +81,7 @@ export function placeShipOnGrid(obj: TParams): ICell[] {
   const { ship } = obj;
   let { grid } = obj;
 
-  [...ship.positions].map(({ position: { x, y }, type }) => {
+  ship.positions.map(({ position: { x, y }, type }) => {
     grid = grid.map(it =>
       it.position.x === x && it.position.y === y
         ? {
@@ -46,13 +90,14 @@ export function placeShipOnGrid(obj: TParams): ICell[] {
           }
         : it
     );
+
+    return false;
   });
 
   return grid;
 }
 
 export function isLegal(obj: TParams): boolean {
-  const legalBounds = withinBounds(obj);
   const grid = [...obj.grid].reduce<{ [k: string]: CellType }>((a, b) => {
     const xy = `${b.position.x}-${b.position.y}`;
     a[xy] = b.type;
