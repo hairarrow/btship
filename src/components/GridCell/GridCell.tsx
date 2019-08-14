@@ -87,7 +87,9 @@ const GridCell: FC<TProps> = ({
       onClick={canBeAttacked ? handleAttackClick : handleClick}
       ref={cellRef}
       height={height}
-    />
+    >
+      {x}-{y}
+    </StyledGridCell>
   );
 };
 

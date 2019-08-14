@@ -143,14 +143,6 @@ export function useActions<T extends IState>(
     };
   }
 
-  // const AITurn = (p: IPlayer[]): TAction => {
-  //   const players = withGridUpdate(takeTurn(p));
-  //   return {
-  //     type: AIActions.Shoot,
-  //     players
-  //   };
-  // };
-
   function endTurn(): TAction {
     const {
       game: { playerTurn: P }
@@ -265,47 +257,35 @@ export function useActions<T extends IState>(
     );
   }
 
-  function moveShip(ship: string, position: IPosition): TAction {
-    const { players: playersState } = state;
+  function moveShip(shipName: string, position: IPosition): TAction {
+    const {
+      players: playersState,
+      game: { gridSize }
+    } = state;
     const { fleet: fleetState, grid } = [...playersState].filter(
       ({ type }) => type === PlayerType.Human
     )[0];
     const { ships: shipsState } = fleetState;
-    const ships = [...shipsState].map(({ name, ...s }) =>
-      name === ship
-        ? {
-            ...s,
-            name,
-            position,
-            positions: [...Array(s.size)].map((it, idx) =>
-              s.direction === ShipDirection.Vertical
-                ? {
-                    position: {
-                      x: position.x,
-                      y: position.y + idx
-                    },
-                    type: checkValidCoords(grid, {
-                      x: position.x,
-                      y: position.y + idx
-                    })
-                      ? CellType.HoverShip
-                      : CellType.InvalidLocation
-                  }
-                : {
-                    position: {
-                      x: position.x + idx,
-                      y: position.y
-                    },
-                    type: CellType.HoverShip
-                  }
-            )
-          }
-        : { ...s, name }
-    );
-    const fleet = { ...fleetState, ships };
+    let ship = [...shipsState].filter(it => it.name === shipName)[0];
+    const obj = {
+      ship,
+      grid,
+      position,
+      gridSize,
+      player: PlayerType.Human,
+      direction: ship.direction
+    };
+
+    if (isLegal(obj)) {
+      ship = placeShip(obj, true);
+    }
+
+    const ships = [...shipsState].map(it => (it.name === shipName ? ship : it));
     const players = withGridUpdate(
-      [...playersState].map(({ type, ...p }) =>
-        type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
+      [...playersState].map(it =>
+        it.type === PlayerType.Human
+          ? { ...it, fleet: { ...it.fleet, ships } }
+          : it
       )
     );
 

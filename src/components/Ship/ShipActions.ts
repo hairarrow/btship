@@ -16,7 +16,7 @@ type TParams = {
   grid: ICell[];
 };
 
-export function placeShip(obj: TParams): IShip {
+export function placeShip(obj: TParams, hover = false): IShip {
   const {
     ship,
     position: { x, y }
@@ -26,7 +26,7 @@ export function placeShip(obj: TParams): IShip {
       obj.direction === ShipDirection.Vertical
         ? { x, y: y + i }
         : { x: x + i, y };
-    return { position, type: CellType.Ship };
+    return { position, type: hover ? CellType.HoverShip : CellType.Ship };
   });
   ship.placed = true;
 
@@ -59,17 +59,17 @@ export function isLegal(obj: TParams): boolean {
     return a;
   }, {});
 
-  if (legalBounds) {
-    for (let i = 0; i < obj.ship.size; i++) {
+  if (withinBounds(obj)) {
+    const shipCells = [...new Array(obj.ship.size)].map((_, i) => {
       const cell =
         obj.direction === ShipDirection.Vertical
-          ? grid[`${obj.position.x + i}${obj.position.y}`]
-          : grid[`${obj.position.x}${obj.position.y + i}`];
-      return ![CellType.Ship, CellType.Miss, CellType.Sunk].some(
-        it => it === cell
-      );
-    }
-    return false;
+          ? `${obj.position.x}-${obj.position.y + i}`
+          : `${obj.position.x + i}-${obj.position.y}`;
+      return grid[cell];
+    });
+    return shipCells.every(it =>
+      [CellType.Empty, CellType.HoverShip].includes(it)
+    );
   } else {
     return false;
   }
