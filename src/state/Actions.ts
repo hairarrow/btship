@@ -122,24 +122,23 @@ export function useActions<T extends IState>(
   // TODO Check if valid shot
   function shoot(targetPlayer: PlayerType, position: IPosition): TAction {
     const { players: playerState } = state;
-    const { grid: G } = [...playerState].filter(
-      ({ type }) => type === targetPlayer
-    )[0];
-    const grid = [...G].map(({ ...rest }) => {
-      if (position.x === rest.position.x && position.y === rest.position.y) {
-        console.log(rest.type);
-        return {
-          ...rest,
-          type: rest.type === CellType.Ship ? CellType.Hit : CellType.Miss
-        };
-      } else return { ...rest };
+    const {
+      fleet: { ships: shipsState }
+    } = [...playerState].filter(({ type }) => type === targetPlayer)[0];
+    const ships = [...shipsState].map(ship => {
+      ship.positions = [...ship.positions].map(p =>
+        p.position.x === position.x && p.position.y === position.y
+          ? { ...p, type: CellType.Hit }
+          : p
+      );
+      return ship;
     });
     const p = [...playerState].map(p =>
-      p.type === targetPlayer ? { ...p, grid } : { ...p }
+      p.type === targetPlayer
+        ? { ...p, fleet: { ...p.fleet, ships } }
+        : { ...p }
     );
 
-    console.log(targetPlayer === PlayerType.Computer);
-    // TODO Shooting the computer doesn't work!
     const aiTurn = takeTurn(p);
     const players = withGridUpdate(aiTurn);
 

@@ -14,6 +14,7 @@ import getHumanPlayer from "../../lib/getHumanPlayer";
 type TProps = {
   cell: ICell;
   type: CellType;
+  odd: boolean;
   canBeAttacked?: boolean;
 };
 
@@ -21,6 +22,7 @@ const GridCell: FC<TProps> = ({
   cell: {
     position: { x, y }
   },
+  odd,
   type,
   canBeAttacked
 }) => {
@@ -57,7 +59,6 @@ const GridCell: FC<TProps> = ({
     } = getHumanPlayer(players);
 
     if (type === CellType.Ship) {
-      // TODO, this fails if you try to place on the same tile you picked up a ship from
       const { name } = [...ships]
         .map(({ name, positions }) => ({ name, positions }))
         .filter(({ positions }) =>
@@ -74,20 +75,17 @@ const GridCell: FC<TProps> = ({
   }, [placing, placeShip, players, x, y, dispatch, selectShip, type]);
 
   const handleAttackClick = useCallback(() => {
-    console.log(x, y);
     dispatch(shoot(PlayerType.Computer, { x, y }));
   }, [dispatch, shoot, x, y]);
 
-  // TODO useStateEffect validPlacement
-  // TODO check if clicking on a placed ship, then select that ship
-
   return (
     <StyledGridCell
-      type={type}
+      type={canBeAttacked && type === CellType.Ship ? CellType.Empty : type}
       onMouseEnter={handleHoverEnter}
       onClick={canBeAttacked ? handleAttackClick : handleClick}
       ref={cellRef}
-      height={height}
+      cellHeight={height}
+      className={`cell ${odd ? "odd-cell" : ""}`}
     >
       {x}-{y}
     </StyledGridCell>

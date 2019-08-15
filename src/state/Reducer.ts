@@ -23,7 +23,7 @@ export const initialState: IState = {
     }
   },
   game: {
-    gridSize: 10,
+    gridSize: 9,
     active: false,
     placing: false,
     inBattle: false,

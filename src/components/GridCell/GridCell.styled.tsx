@@ -1,13 +1,14 @@
 import styled, { DefaultTheme } from "styled-components";
+import { lighten } from "polished";
 import { CellType } from "../../state/Models";
 
 interface IProps {
   readonly type: CellType;
-  readonly height: number;
+  readonly cellHeight: number;
   readonly canBeAttacked?: boolean;
 }
 
-function cellBackground(type: CellType | "odd", theme: DefaultTheme): string {
+function cellBackground(type: CellType, theme: DefaultTheme): string {
   switch (type) {
     case CellType.Sunk:
       return "#000";
@@ -18,8 +19,6 @@ function cellBackground(type: CellType | "odd", theme: DefaultTheme): string {
     case CellType.Miss:
       return "rgba(255, 255, 255, 0.8)";
     case CellType.HoverShip:
-      return "rgba(0, 0, 0, 0.2)";
-    case "odd":
       return "rgba(255, 255, 255, 0.2)";
     case CellType.Empty:
     default:
@@ -27,44 +26,54 @@ function cellBackground(type: CellType | "odd", theme: DefaultTheme): string {
   }
 }
 
+function oddCellBackground(type: CellType, theme: DefaultTheme): string {
+  switch (type) {
+    case CellType.Sunk:
+      return lighten(0.01, "#000");
+    case CellType.Ship:
+      return lighten(0.01, theme.colors.main);
+    case CellType.Hit:
+      return lighten(0.01, theme.colors.accent);
+    case CellType.Miss:
+      return "rgba(255, 255, 255, 0.7)";
+    case CellType.HoverShip:
+      return "rgba(255, 255, 255, 0.1)";
+    case CellType.Empty:
+    default:
+      return "rgba(255, 255, 255, 0.2)";
+  }
+}
+
 const Component = styled.div<IProps>`
   position: relative;
-  height: ${({ height }) => `${height}px`}
+  height: ${({ cellHeight }) => `${cellHeight}px`}
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: ${({ theme: { colors } }) => colors.main}
   background: ${({ type, theme }) => cellBackground(type, theme)};
   z-index: 1000;
   cursor: ${({ canBeAttacked }) => canBeAttacked && "pointer"}
 
-  &:nth-child(20n+2),
-  &:nth-child(20n+4),
-  &:nth-child(20n+6),
-  &:nth-child(20n+8),
-  &:nth-child(20n+10),
-  &:nth-child(20n+11),
-  &:nth-child(20n+13),
-  &:nth-child(20n+15),
-  &:nth-child(20n+17),
-  &:nth-child(20n+19) {
-    background: ${({ type, theme }) =>
-      type === CellType.Empty
-        ? cellBackground("odd", theme)
-        : cellBackground(type, theme)};
+  .cell.odd-cell {
+    background: ${({ type, theme }) => oddCellBackground(type, theme)}
+  }
+
+  &.odd-cell {
+    background: ${({ type, theme }) => oddCellBackground(type, theme)}
   }
 
   &:nth-child(1) {
     border-top-left-radius: 8px;
   }
 
-  &:nth-child(10) {
+  &:nth-child(9) {
     border-top-right-radius: 8px;
   }
 
-  &:nth-child(91) {
+  &:nth-child(73) {
     border-bottom-left-radius: 8px;
   }
 
-  &:nth-child(100) {
+  &:nth-child(81) {
     border-bottom-right-radius: 8px;
   }
 
@@ -76,7 +85,8 @@ const Component = styled.div<IProps>`
     right: 0;
     bottom: 0;
     background: #000;
-    opacity: ${({ type }) => (type === CellType.Empty ? 0.1 : 0)};
+    opacity: ${({ type }) =>
+      [CellType.Empty, CellType.Ship].includes(type) ? 0.1 : 0};
   }
 `;
 

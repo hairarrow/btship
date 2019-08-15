@@ -22,12 +22,13 @@ const Grid: FC<TProps> = ({ grid, canBeAttacked }) => {
       gridSize={gridSize}
       onMouseLeave={() => dispatch(removeSelectedShip())}
     >
-      {grid.map(cell => (
+      {grid.map((cell, i) => (
         <GridCell
           key={`${cell.position.x}${cell.position.y}`}
           cell={cell}
           type={cell.type}
           canBeAttacked={canBeAttacked}
+          odd={i % 2 === 0}
         />
       ))}
     </StyledGrid>
