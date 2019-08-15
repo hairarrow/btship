@@ -17,19 +17,4 @@ export default styled.section`
     font-size: 18px;
     margin: 20px;
   }
-
-  button {
-    background: rgba(255, 255, 255, 0.1);
-    width: 200px;
-    height: 48px;
-    font-size: 18px;
-    font-weight: 500;
-    font-family: inherit;
-    appearance: none;
-    color: inherit;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.5);
-    }
-  }
 `;

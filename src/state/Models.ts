@@ -68,6 +68,7 @@ export interface IPlayer {
   fleet: IFleet;
   grid: ICell[];
   type: PlayerType;
+  shots: IPosition[];
 }
 
 export interface IFleet {

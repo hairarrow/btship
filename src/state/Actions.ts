@@ -64,7 +64,8 @@ export function useActions<T extends IState>(
     const player: IPlayer = {
       fleet,
       grid,
-      type
+      type,
+      shots: []
     };
 
     return {
@@ -123,7 +124,8 @@ export function useActions<T extends IState>(
   function shoot(targetPlayer: PlayerType, position: IPosition): TAction {
     const { players: playerState } = state;
     const {
-      fleet: { ships: shipsState }
+      fleet: { ships: shipsState },
+      shots: shotsState
     } = [...playerState].filter(({ type }) => type === targetPlayer)[0];
     const ships = [...shipsState].map(ship => {
       ship.positions = [...ship.positions].map(p =>
@@ -133,9 +135,10 @@ export function useActions<T extends IState>(
       );
       return ship;
     });
+    const shots = [...shotsState, position];
     const p = [...playerState].map(p =>
       p.type === targetPlayer
-        ? { ...p, fleet: { ...p.fleet, ships } }
+        ? { ...p, fleet: { ...p.fleet, ships }, shots }
         : { ...p }
     );
 
@@ -313,7 +316,7 @@ export function useActions<T extends IState>(
   }
 
   function withGridUpdate(P: IPlayer[]): IPlayer[] {
-    const players = [...P].map(({ fleet, grid: G, ...rest }) => {
+    const players = [...P].map(({ fleet, grid: G, shots, ...rest }) => {
       const { ships } = fleet;
       const fleetShips = [...ships].map(it => {
         const sunk = [...it.positions].every(p => p.type === CellType.Hit);
@@ -345,6 +348,8 @@ export function useActions<T extends IState>(
               ? [...shipCoords].filter(
                   ({ position: { x, y } }) => `${x}-${y}` === `${P.x}-${P.y}`
                 )[0].type
+              : [...shots].map(it => it.x === P.x && it.y === P.y).some(Boolean)
+              ? CellType.Miss
               : rest.type === CellType.Miss ||
                 rest.type === CellType.Hit ||
                 rest.type === CellType.Sunk
@@ -359,7 +364,8 @@ export function useActions<T extends IState>(
           ...fleet,
           ships: fleetShips
         },
-        grid
+        grid,
+        shots
       };
     });
 

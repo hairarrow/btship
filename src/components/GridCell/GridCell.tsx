@@ -86,9 +86,7 @@ const GridCell: FC<TProps> = ({
       ref={cellRef}
       cellHeight={height}
       className={`cell ${odd ? "odd-cell" : ""}`}
-    >
-      {x}-{y}
-    </StyledGridCell>
+    />
   );
 };
 

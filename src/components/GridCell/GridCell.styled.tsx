@@ -19,7 +19,7 @@ function cellBackground(type: CellType, theme: DefaultTheme): string {
     case CellType.Miss:
       return "rgba(255, 255, 255, 0.8)";
     case CellType.HoverShip:
-      return "rgba(255, 255, 255, 0.2)";
+      return "rgba(0, 0, 0, 0.2)";
     case CellType.Empty:
     default:
       return "rgba(255, 255, 255, 0.3)";
@@ -37,7 +37,7 @@ function oddCellBackground(type: CellType, theme: DefaultTheme): string {
     case CellType.Miss:
       return "rgba(255, 255, 255, 0.7)";
     case CellType.HoverShip:
-      return "rgba(255, 255, 255, 0.1)";
+      return "rgba(0, 0, 0, 0.2)";
     case CellType.Empty:
     default:
       return "rgba(255, 255, 255, 0.2)";
@@ -51,7 +51,8 @@ const Component = styled.div<IProps>`
   color: ${({ theme: { colors } }) => colors.main}
   background: ${({ type, theme }) => cellBackground(type, theme)};
   z-index: 1000;
-  cursor: ${({ canBeAttacked }) => canBeAttacked && "pointer"}
+  cursor: pointer;
+  transition: background 120ms ease;
 
   .cell.odd-cell {
     background: ${({ type, theme }) => oddCellBackground(type, theme)}

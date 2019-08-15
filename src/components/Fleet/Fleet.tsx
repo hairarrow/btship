@@ -1,6 +1,7 @@
 import React, { FC, useContext } from "react";
 import { ctx } from "../../App";
 import { PlayerType } from "../../state/Models";
+import Button from "../Button";
 
 const Fleet: FC<{ player: string }> = ({ player }) => {
   const {
@@ -15,13 +16,16 @@ const Fleet: FC<{ player: string }> = ({ player }) => {
   return (
     <div>
       {selectedShip ? (
-        <div>
-          <button onClick={() => dispatch(rotateShip())}>Rotate</button>
-        </div>
+        <Button
+          style={{ marginBottom: 16 }}
+          onClick={() => dispatch(rotateShip())}
+        >
+          Rotate
+        </Button>
       ) : (
         ""
       )}
-      <button
+      <Button
         disabled={![...ships].every(({ placed }) => placed)}
         onClick={() => {
           dispatch(placeAutomatically(PlayerType.Computer));
@@ -29,26 +33,26 @@ const Fleet: FC<{ player: string }> = ({ player }) => {
         }}
       >
         Start the Battle
-      </button>
-      <button onClick={() => dispatch(placeAutomatically(PlayerType.Human))}>
+      </Button>
+      <Button
+        style={{ marginLeft: 16 }}
+        onClick={() => dispatch(placeAutomatically(PlayerType.Human))}
+      >
         Place Randomly
-      </button>
-      <h2>Fleet</h2>
-      <ul>
+      </Button>
+      <h2 style={{ marginTop: 24 }}>Fleet</h2>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         {ships.map(({ name, size, placed }) => (
-          <button
+          <Button
             key={name}
-            style={{
-              color:
-                selectedShip && selectedShip.name === name ? "blue" : "inherit",
-              opacity: placed ? 0.2 : 1
-            }}
+            disabled={placed}
             onClick={() => dispatch(selectShip(name))}
+            style={{ marginTop: 16 }}
           >
             {name} – {size}
-          </button>
+          </Button>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

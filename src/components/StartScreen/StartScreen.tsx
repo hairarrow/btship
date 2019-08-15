@@ -1,6 +1,7 @@
 import React, { FC, useContext } from "react";
 import { ctx } from "../../App";
 import Container from "./StartScreen.styled";
+import Button from "../Button";
 
 const StartScreen: FC = () => {
   const {
@@ -12,7 +13,7 @@ const StartScreen: FC = () => {
     <Container>
       <h1 className="title">BattleBoats</h1>
       <h2>Can you beat the computer?</h2>
-      <button onClick={() => dispatch(startGame())}>Start</button>
+      <Button onClick={() => dispatch(startGame())}>Start</Button>
     </Container>
   );
 };
