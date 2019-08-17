@@ -1,4 +1,4 @@
-import React, { useContext, FC } from "react";
+import React, { useContext, FC, HTMLAttributes } from "react";
 import { ctx } from "../../App";
 import StyledGrid from "./Grid.styled";
 import GridCell from "../GridCell";
@@ -8,7 +8,11 @@ type TProps = {
   grid: ICell[];
   canBeAttacked?: boolean;
 };
-const Grid: FC<TProps> = ({ grid, canBeAttacked }) => {
+const Grid: FC<TProps & HTMLAttributes<HTMLDivElement>> = ({
+  grid,
+  canBeAttacked,
+  ...props
+}) => {
   const {
     state: {
       game: { gridSize }
@@ -21,6 +25,7 @@ const Grid: FC<TProps> = ({ grid, canBeAttacked }) => {
     <StyledGrid
       gridSize={gridSize}
       onMouseLeave={() => dispatch(removeSelectedShip())}
+      {...props}
     >
       {grid.map((cell, i) => (
         <GridCell

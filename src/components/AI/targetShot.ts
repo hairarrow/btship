@@ -55,6 +55,10 @@ export default function targetShot(
     }
   );
 
+  for (const xCoord of xyHitSets.x) {
+    console.log(xCoord);
+  }
+
   if (xyHitSets.x.entries.length === 1) {
     // then try to find a consecutive shot with Y
     // if you can't find a valid consecutive shot with Y coords,

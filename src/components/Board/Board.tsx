@@ -17,17 +17,18 @@ const Board: FC = () => {
 
   return placing ? (
     <BoardContainer>
-      <h1>Place your ships!</h1>
-      <Grid grid={getHumanPlayer(players).grid} />
+      <h1 className="board__title">Place your ships!</h1>
+      <Grid className="board__grid" grid={getHumanPlayer(players).grid} />
       <Fleet player={PlayerType.Human} />
     </BoardContainer>
   ) : (
     <BoardContainer>
-      <Grid grid={getHumanPlayer(players).grid} />
+      <Grid className="board__human-grid" grid={getHumanPlayer(players).grid} />
 
       <h2>Sink the Ships!</h2>
 
       <Grid
+        className="board__ai-grid"
         grid={getAIPlayer(players).grid}
         canBeAttacked={playerTurn === PlayerType.Human}
       />

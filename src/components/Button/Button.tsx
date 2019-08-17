@@ -16,7 +16,7 @@ const Button: FC<HTMLProps<HTMLButtonElement>> = ({
 const StyledButton = styled.button`
   background: ${({ theme }) => theme.colors.accent}
   padding: 8px 24px;
-  height: 48px;
+  min-height: 48px;
   font-size: 18px;
   font-weight: 500;
   font-family: inherit;
