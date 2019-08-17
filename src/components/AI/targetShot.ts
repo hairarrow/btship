@@ -13,7 +13,7 @@ export default function targetShot(
   grid: ICell[],
   segments: TSegment[],
   fleet: IShip[]
-) {
+): IPosition {
   const cellProbs = gridProbCoords(grid);
   const cellTypes = gridTypeCoords(grid);
   const hits = [...grid].filter(it => it.type === CellType.Hit);
@@ -51,7 +51,9 @@ export default function targetShot(
       return cellTypes[`${x}${y}`] === CellType.Empty;
     });
 
-    return shots;
+    return shots.length === 1
+      ? shots[0]
+      : shots[Math.floor(Math.random() * shots.length)];
   } else {
     const neighborCells = [...grid].filter(cell =>
       [...hits].some(
@@ -76,26 +78,35 @@ export default function targetShot(
         neighborCells.some(c => c.position.y === it.start.y)
     );
 
-    const segmentProbs = [...possibleSegments].map(({ size, start, end }) => {
+    for (const { size, start, end } of possibleSegments) {
       const xy = start.x === end.x ? "x" : "y";
       const xyOp = xy === "x" ? "y" : "x";
-      const coords = [...Array(size)].map((_, idx) => {
-        const ss = [...fleet]
-          .filter(({ size }) => size >= size! - idx)
-          .map(it => {
-            [...Array(it.size)].map((_, ii) => {
-              const key = `${xy === "x" ? start[xy] : start[xyOp] + ii}${
-                xy === "y" ? start[xy] : start[xyOp] + ii
-              }`;
+      for (let i = start[xyOp]; i < size!; i++) {
+        const minSize = size! - (start[xyOp] + i);
 
-              console.log(key);
-              console.log(cellProbs[key]);
-              console.log(cellProbs);
+        for (const ship of [...fleet].filter(({ size }) => size <= minSize)) {
+          for (let ii = 0; ii <= ship.size; ii++) {
+            const xKey = xy === "x" ? start[xy] : start[xyOp] + i + ii;
+            const yKey = xy === "x" ? start[xyOp] + i + ii : start[xy];
+            const key = `${xKey}${yKey}`;
+            if ([xKey, yKey].every(n => n <= 8)) cellProbs[key]++;
+          }
+        }
+      }
+    }
 
-              // cellProbs[key] = cellProbs
-            });
-          });
-      });
-    });
+    const probCells = [...neighborCells]
+      .map(cell => {
+        const {
+          position: { x, y }
+        } = cell;
+        const probability = cellProbs[`${x}${y}`];
+        return { x, y, probability };
+      })
+      .sort((a, b) => b.probability - a.probability);
+
+    console.log(probCells);
+
+    return probCells[0];
   }
 }

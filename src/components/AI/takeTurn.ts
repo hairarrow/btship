@@ -34,82 +34,18 @@ export function takeTurn(playersState: IPlayer[], gridSize: number): IPlayer[] {
   const segments = createSegments(hiddenGrid, smallestShipSize);
 
   if (aiMode === AIMode.TARGET) {
-    const foo = targetShot(hiddenGrid, segments, humanFleet);
-    const hits = [...hiddenGrid].filter(it => it.type === CellType.Hit);
-    const neighborCells = [...hiddenGrid].filter(cell =>
-      [...hits].some(
-        (hit): boolean => {
-          return (
-            cell.type === CellType.Empty &&
-            cell.position.x <= 9 &&
-            cell.position.y <= 9 &&
-            (cell.position.x === hit.position.x ||
-              cell.position.y === hit.position.y) &&
-            (cell.position.y === hit.position.y + 1 ||
-              cell.position.y === hit.position.y - 1 ||
-              cell.position.x === hit.position.x + 1 ||
-              cell.position.x === hit.position.x - 1)
-          );
-        }
-      )
-    );
-
-    const possibleSegments = [...segments].filter(
-      it =>
-        ((it.start.x === it.end.x || it.start.y === it.end.y) &&
-          neighborCells.some(c => c.position.x === it.start.x)) ||
-        neighborCells.some(c => c.position.y === it.start.y)
-    );
-    const probs = [...possibleSegments].reduce<any>((coords, segment) => {
-      if (!segment.size) return coords;
-      for (let i = 0; i < segment.size; i++) {
-        const aFleet = [...humanFleet].filter(
-          s => segment.size && s.size <= segment.size
-        );
-        [...aFleet].map(ship => {
-          [...new Array(ship.size)].map((_, shipGrid) => {
-            const xy =
-              segment.start.x === segment.end.x
-                ? `${segment.start.x}-${segment.start.y + i}`
-                : `${segment.start.x + i}-${segment.start.y}`;
-            if (coords[xy] === undefined) coords[xy] = 0;
-            else {
-              coords[xy] = coords[xy] + 1;
-            }
-            return null;
-          });
-          return null;
-        });
-      }
-
-      return coords;
-    }, {});
-
-    // TODO add additional weight to conseq hits
-
-    const shot = [...neighborCells][0];
-    const s = [...neighborCells].map(it => ({
-      ...it,
-      probability: probs[`${it.position.x}${it.position.y}`] || 0
-    }));
+    const target = targetShot(hiddenGrid, segments, humanFleet);
     const grid = [...humanGrid].map(it => {
-      if (
-        it.position.x === shot.position.x &&
-        it.position.y === shot.position.y
-      )
+      if (it.position.x === target.x && it.position.y === target.y)
         return {
           ...it,
           type: it.type === CellType.Ship ? CellType.Hit : CellType.Miss
         };
       return it;
     });
-
     const fleetShips = [...humanFleet].map(it => {
       const positions = [...it.positions].map(pos => {
-        if (
-          shot.position.x === pos.position.x &&
-          shot.position.y === pos.position.y
-        )
+        if (target.x === pos.position.x && target.y === pos.position.y)
           return { ...pos, type: CellType.Hit };
         return pos;
       });
