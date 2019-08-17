@@ -24,6 +24,8 @@ export enum ShipDirection {
   Horizontal
 }
 
+export type TXoY = "x" | "y";
+
 export interface IPosition {
   x: number;
   y: number;

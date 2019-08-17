@@ -7,6 +7,7 @@ import {
 } from "../../state/Models";
 import getHumanPlayer from "../../lib/getHumanPlayer";
 import createSegments from "./createSegments";
+import targetShot from "./targetShot";
 
 type TSegment = {
   start: IPosition;
@@ -15,7 +16,7 @@ type TSegment = {
 };
 
 // TODO BREAK THIS UP
-export function takeTurn(playersState: IPlayer[]): IPlayer[] {
+export function takeTurn(playersState: IPlayer[], gridSize: number): IPlayer[] {
   const humanGrid = getHumanPlayer(playersState).grid;
   const hiddenGrid = [...humanGrid].map(it => {
     if (it.type === CellType.Ship) return { ...it, type: CellType.Empty };
@@ -33,6 +34,7 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
   const segments = createSegments(hiddenGrid, smallestShipSize);
 
   if (aiMode === AIMode.TARGET) {
+    const foo = targetShot(hiddenGrid, segments, humanFleet);
     const hits = [...hiddenGrid].filter(it => it.type === CellType.Hit);
     const neighborCells = [...hiddenGrid].filter(cell =>
       [...hits].some(
@@ -52,7 +54,6 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
       )
     );
 
-    console.log(segments);
     const possibleSegments = [...segments].filter(
       it =>
         ((it.start.x === it.end.x || it.start.y === it.end.y) &&
@@ -91,7 +92,6 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
       ...it,
       probability: probs[`${it.position.x}${it.position.y}`] || 0
     }));
-    console.log(s);
     const grid = [...humanGrid].map(it => {
       if (
         it.position.x === shot.position.x &&
@@ -124,7 +124,6 @@ export function takeTurn(playersState: IPlayer[]): IPlayer[] {
     );
     return players;
   } else {
-    console.log("hunt");
     const probability = [...segments].reduce<any>((coords, b) => {
       if (!b.size) return coords;
       for (let i = 0; i < b.size; i++) {

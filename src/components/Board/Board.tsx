@@ -15,7 +15,6 @@ const Board: FC = () => {
     }
   } = useContext(ctx);
 
-  console.log("update");
   return placing ? (
     <BoardContainer>
       <h1>Place your ships!</h1>

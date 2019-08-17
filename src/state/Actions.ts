@@ -142,7 +142,7 @@ export function useActions<T extends IState>(
         : { ...p }
     );
 
-    const aiTurn = takeTurn(p);
+    const aiTurn = takeTurn(p, state.game.gridSize);
     const players = withGridUpdate(aiTurn);
 
     return {
