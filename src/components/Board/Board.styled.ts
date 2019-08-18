@@ -6,7 +6,8 @@ const BoardContainer = styled.section`
     grid-template-areas:
       "header"
       "board"
-      "fleet";
+      "fleet"
+      "stats";
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;
     grid-row-gap: 24px;
@@ -20,10 +21,13 @@ const BoardContainer = styled.section`
     &__title {
       text-align: center;
       grid-area: header;
+      grid-column-start: 1;
+      grid-column-end: span 2;
     }
 
     &__fleet {
       grid-area: fleet;
+      justify-self: end;
     }
 
     &__grid {
@@ -38,36 +42,79 @@ const BoardContainer = styled.section`
       grid-area: opponent-grid;
     }
 
+    &__grid,
+    &__player-grid,
+    &__opponent-grid {
+      place-self: stretch center;
+    }
+
+    &__stats {
+      grid-area: stats;
+    }
+
     &--battle {
       grid-template-areas:
         "header"
+        "player-grid"
         "opponent-grid"
-        "player-grid";
+        "stats";
+      grid-template-rows: auto 1fr 1fr auto;
 
       @media (${({ theme: { breakpoints } }) => breakpoints.large}) {
         grid-template-areas:
           "header header"
-          "opponent-grid player-grid";
+          "player-grid opponent-grid"
+          "stats";
         grid-column-gap: 24px;
         grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto 1fr;
+        grid-template-rows: auto 1fr auto;
+
+        .board {
+          &__player-grid {
+            grid-row-start: 2;
+            grid-row-end: span 2;
+            grid-column-start: 1;
+            grid-column-end: span 1;
+          }
+
+          &__opponent-grid {
+            grid-row-start: 2;
+            grid-row-end: span 2;
+            grid-column-start: 2;
+            grid-column-end: span 2;
+          }
+        }
       }
     }
 
     &--placing {
+      grid-template-areas:
+        "header"
+        "board"
+        "board"
+        "fleet"
+        "stats";
+
       @media (${({ theme: { breakpoints } }) => breakpoints.large}) {
         grid-template-areas:
           "header header"
-          "fleet board";
+          "fleet board"
+          "stats";
         grid-column-gap: 24px;
         grid-template-columns: auto 1fr;
-        grid-template-rows: auto 1fr;
-      }
+        grid-template-rows: auto 1fr auto;
 
-      .board {
-        &__title {
-          grid-column-start: 1;
-          grid-column-end: span 2;
+        .board {
+          &__grid {
+            grid-row-start: 2;
+            grid-row-end: span 2;
+            grid-column-start: 2;
+          }
+
+          &__fleet {
+            grid-row-start: 2;
+            grid-row-end: span 2;
+          }
         }
       }
     }

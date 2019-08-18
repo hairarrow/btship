@@ -7,6 +7,7 @@ import React, {
   useEffect
 } from "react";
 import { ctx } from "../../App";
+import useComponentSize from "@rehooks/component-size";
 import StyledGrid from "./Grid.styled";
 import GridCell from "../GridCell";
 import { ICell } from "../../state/Models";
@@ -21,13 +22,17 @@ const Grid: FC<TProps & HTMLAttributes<HTMLDivElement>> = ({
   canBeAttacked,
   ...props
 }) => {
-  const [height, setHeight] = useState(0);
   const gridRef = useRef<HTMLDivElement>(null);
+  const { width, height } = useComponentSize(gridRef);
+  const [gridHeight, setGridHeight] = useState(0);
 
   useEffect(() => {
-    if (gridRef.current)
-      setHeight(gridRef.current.getBoundingClientRect().height / 1.5);
-  }, []);
+    if (window.innerWidth < height * 2) {
+      setGridHeight(height / 1.33);
+    } else {
+      setGridHeight(height);
+    }
+  }, [width, height]);
 
   const {
     state: {
@@ -42,7 +47,7 @@ const Grid: FC<TProps & HTMLAttributes<HTMLDivElement>> = ({
       ref={gridRef}
       gridSize={gridSize}
       onMouseLeave={() => dispatch(removeSelectedShip())}
-      gridHeight={height}
+      gridHeight={gridHeight}
       {...props}
     >
       {grid.map((cell, i) => (

@@ -23,7 +23,6 @@ const Game: FC = () => {
     actions: { startGame, gameOver, resetGame },
     dispatch
   } = useContext(ctx);
-  const [showGameOver, setShowGameOver] = useState(false);
   const [waveConfig, setWaveConfig] = useState({
     waveHeight: 1,
     waveSpeed: 0.5
@@ -55,11 +54,7 @@ const Game: FC = () => {
         } else Modal.success(modalConfig);
       }
     }
-  }, [game, players]);
-
-  useEffect(() => {
-    if (!game.active) dispatch(startGame());
-  }, []);
+  }, [game, players, dispatch, gameOver, resetGame, startGame]);
 
   useEffect(() => {
     const wavesConfig = {
