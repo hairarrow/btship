@@ -344,7 +344,6 @@ export function useActions<T extends IState>(
           }))
         };
       });
-      console.log(fleetShips);
       const shipCoords = [...fleetShips].reduce<ICell[]>(
         (acc, { positions }) => [...acc, ...positions],
         []

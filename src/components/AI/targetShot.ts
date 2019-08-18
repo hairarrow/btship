@@ -17,19 +17,17 @@ export default function targetShot(
   const hits = [...grid].filter(it => it.type === CellType.Hit);
   const hitSegments = createHitSegments(hits);
   const neighborCells = [...grid].filter(cell =>
-    [...hits].some(
-      (hit): boolean => {
-        return (
-          cell.type === CellType.Empty &&
-          (cell.position.x === hit.position.x ||
-            cell.position.y === hit.position.y) &&
-          (cell.position.y === hit.position.y + 1 ||
-            cell.position.y === hit.position.y - 1 ||
-            cell.position.x === hit.position.x + 1 ||
-            cell.position.x === hit.position.x - 1)
-        );
-      }
-    )
+    [...hits].some((hit): boolean => {
+      return (
+        cell.type === CellType.Empty &&
+        (cell.position.x === hit.position.x ||
+          cell.position.y === hit.position.y) &&
+        (cell.position.y === hit.position.y + 1 ||
+          cell.position.y === hit.position.y - 1 ||
+          cell.position.x === hit.position.x + 1 ||
+          cell.position.x === hit.position.x - 1)
+      );
+    })
   );
 
   type TXYHits = { [key in TXoY]: number[] | Set<number> };
@@ -55,27 +53,6 @@ export default function targetShot(
     }
   );
 
-  for (const xCoord of xyHitSets.x) {
-    // console.log(xCoord);
-  }
-
-  if (xyHitSets.x.entries.length === 1) {
-    // then try to find a consecutive shot with Y
-    // if you can't find a valid consecutive shot with Y coords,
-    // then try finding a consec shot with +/- X coords
-  }
-
-  if (xyHitSets.x.entries.length > xyHitSets.y.entries.length) {
-  }
-
-  // console.log(xyHitSets);
-
-  // for (const hit of hits) {
-  //   const XY = [...hits].reduce((a, b) => {
-  //     Object.keys(b)
-  //   },{})
-  // }
-
   const dirs: TXoY[] = ["x", "y"];
   // TODO GET RID OF THIS GARBJ
   // This blocks out when it thinks the ship is in one direction
@@ -89,27 +66,42 @@ export default function targetShot(
       const xyOp: TXoY = xy === "x" ? "y" : "x";
       const SE = [start, end];
       if (size < 1) return false;
-      return SE.map(
-        (point, idx): boolean | Partial<IPosition> => {
-          const p = point[xy];
-          const pOp = point[xyOp];
-          const shot: Partial<{ [k in TXoY]: number }> = {
-            [xy]: idx ? p + 1 : p - 1,
-            [xyOp]: pOp
-          };
-          if (p >= 0 && p <= 8) return shot;
-          else return false;
-        }
-      ).filter(Boolean);
+      return SE.map((point, idx): boolean | Partial<IPosition> => {
+        const p = point[xy];
+        const pOp = point[xyOp];
+        const shot: Partial<{ [k in TXoY]: number }> = {
+          [xy]: idx ? p + 1 : p - 1,
+          [xyOp]: pOp
+        };
+        if (p >= 0 && p <= 8) return shot;
+        else return false;
+      }).filter(Boolean);
     })
     .filter(Boolean)
     .reduce((a, b) => [...a, ...b], []);
 
   if (hits.length >= 2) {
     const shots = [...(nextShots as IPosition[])].filter(p => {
-      // @ts-ignore
       return cellTypes[`${p.x}${p.y}`] === CellType.Empty;
     });
+
+    if (shots.length === 0) {
+      const newShots: IPosition[] = [];
+      for (const x of xyHitSets.x.values()) {
+        for (const y of xyHitSets.y.values()) {
+          if (x <= 7 && y <= 7) newShots.push({ x: x + 1, y: y + 1 });
+          if (x >= 1 && y >= 1) newShots.push({ x: x - 1, y: y - 1 });
+        }
+      }
+
+      const possibleNewShots = [...newShots].filter(
+        ({ x, y }) => cellTypes[`${x}${y}`] === CellType.Empty
+      );
+
+      return possibleNewShots[
+        Math.floor(Math.random() * possibleNewShots.length)
+      ];
+    }
 
     return shots.length === 1
       ? shots[0]
