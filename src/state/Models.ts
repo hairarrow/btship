@@ -84,6 +84,8 @@ export interface IGame {
   placing: boolean;
   inBattle: boolean;
   playerTurn: PlayerType;
+  over: boolean;
+  winner: PlayerType | null;
 }
 
 export interface IAI {

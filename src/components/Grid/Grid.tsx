@@ -26,7 +26,7 @@ const Grid: FC<TProps & HTMLAttributes<HTMLDivElement>> = ({
 
   useEffect(() => {
     if (gridRef.current)
-      setHeight(gridRef.current.getBoundingClientRect().height);
+      setHeight(gridRef.current.getBoundingClientRect().height / 1.5);
   }, []);
 
   const {

@@ -1,4 +1,4 @@
-import { PlayerType, IPosition, IPlayer, IGame } from "./Models";
+import { PlayerType, IPosition, IPlayer, IGame, IStats } from "./Models";
 
 export enum GameActions {
   Start = "GAME_START",
@@ -34,7 +34,15 @@ export enum AIActions {
 
 // TODO Don't do this. Be specific about the states that change... OR ELSE...
 export type TAction =
-  | { type: GameActions.Start | GameActions.EndTurn; game: IGame }
+  | {
+      type:
+        | GameActions.Start
+        | GameActions.EndTurn
+        | GameActions.Lost
+        | GameActions.Won;
+      game: IGame;
+    }
+  | { type: GameActions.Lost | GameActions.Won; stats: IStats; game: IGame }
   | { type: PlayerActions.Create; player: IPlayer }
   | {
       type:
@@ -52,6 +60,7 @@ export type TAction =
         | ShipActions.CheckPlacement
         | ShipActions.Hit
         | ShipActions.Sink
+        | GameActions.Reset
         | GameActions.EndPlacing;
     };
 
@@ -66,4 +75,6 @@ export interface IActions {
   finishPlacing(): TAction;
   shoot(targetPlayer: PlayerType, position: IPosition): TAction;
   placeAutomatically(p: PlayerType): TAction;
+  gameOver(winner: PlayerType): TAction;
+  resetGame(): TAction;
 }

@@ -56,7 +56,7 @@ export default function targetShot(
   );
 
   for (const xCoord of xyHitSets.x) {
-    console.log(xCoord);
+    // console.log(xCoord);
   }
 
   if (xyHitSets.x.entries.length === 1) {
@@ -68,7 +68,7 @@ export default function targetShot(
   if (xyHitSets.x.entries.length > xyHitSets.y.entries.length) {
   }
 
-  console.log(xyHitSets);
+  // console.log(xyHitSets);
 
   // for (const hit of hits) {
   //   const XY = [...hits].reduce((a, b) => {
@@ -141,7 +141,6 @@ export default function targetShot(
 
     const probCells = sortedProbableCells(neighborCells, cellProbs);
 
-    console.log(probCells.length);
     return probCells[0];
   }
 }

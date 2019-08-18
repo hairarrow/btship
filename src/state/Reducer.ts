@@ -27,7 +27,9 @@ export const initialState: IState = {
     active: false,
     placing: false,
     inBattle: false,
-    playerTurn: PlayerType.Human
+    playerTurn: PlayerType.Human,
+    over: false,
+    winner: null
   },
   players: [],
   ai: {
@@ -40,6 +42,11 @@ export default function reducer(
   action: TAction
 ): IState {
   switch (action.type) {
+    case PlayerActions.Create:
+      return {
+        ...state,
+        players: [...state.players, action.player]
+      };
     case AIActions.Shoot:
     case ShipActions.UpdateCoords:
     case ShipActions.Rotate:
@@ -50,11 +57,6 @@ export default function reducer(
       return {
         ...state,
         players: action.players
-      };
-    case PlayerActions.Create:
-      return {
-        ...state,
-        players: [...state.players, action.player]
       };
     case GameActions.Start:
       return {
@@ -72,6 +74,20 @@ export default function reducer(
           ...state.game,
           placing: false,
           inBattle: true
+        }
+      };
+    case GameActions.Won:
+    case GameActions.Lost:
+      return {
+        ...state,
+        game: action.game
+      };
+    case GameActions.Reset:
+      return {
+        ...initialState,
+        stats: {
+          ...initialState.stats,
+          games: state.stats.games
         }
       };
 

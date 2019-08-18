@@ -27,7 +27,6 @@ import {
   randomPlacements
 } from "../components/Ship/ShipActions";
 import analytics from "../analytics";
-import { checkWinner } from "../components/Game/checkWinner";
 
 export function useActions<T extends IState>(
   state: T,
@@ -342,6 +341,7 @@ export function useActions<T extends IState>(
           }))
         };
       });
+
       const shipCoords = [...fleetShips].reduce<ICell[]>(
         (acc, { positions }) => [...acc, ...positions],
         []
@@ -383,10 +383,48 @@ export function useActions<T extends IState>(
       };
     });
 
-    const winner = checkWinner(players);
-    console.log(winner);
-
     return players;
+  }
+
+  function gameOver(winner: PlayerType): TAction {
+    const game = {
+      ...state.game,
+      over: true,
+      inBattle: false,
+      winner
+    };
+    const type =
+      winner === PlayerType.Human ? GameActions.Won : GameActions.Lost;
+    const stats = {
+      ...state.stats,
+      games: {
+        ...state.stats.games,
+        played: state.stats.games.played++,
+        won:
+          winner === PlayerType.Human
+            ? state.stats.games.won++
+            : state.stats.games.won
+      }
+    };
+
+    analytics.event({
+      category: "Game Over",
+      action: `${winner === PlayerType.Human ? "Human" : "AI"} Wins`
+    });
+
+    console.log("WINNER IS", winner);
+
+    return {
+      type,
+      game,
+      stats
+    };
+  }
+
+  function resetGame(): TAction {
+    return {
+      type: GameActions.Reset
+    };
   }
 
   return {
@@ -399,6 +437,8 @@ export function useActions<T extends IState>(
     removeSelectedShip,
     finishPlacing,
     shoot,
-    placeAutomatically
+    placeAutomatically,
+    gameOver,
+    resetGame
   };
 }
