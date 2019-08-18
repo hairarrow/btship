@@ -60,8 +60,9 @@ const GridCell: FC<TProps> = ({
   }, [placing, placeShip, players, x, y, dispatch, selectShip, type]);
 
   const handleAttackClick = useCallback(() => {
-    dispatch(shoot(PlayerType.Computer, { x, y }));
-  }, [dispatch, shoot, x, y]);
+    if ([CellType.Empty, CellType.Ship].includes(type))
+      dispatch(shoot(PlayerType.Computer, { x, y }));
+  }, [dispatch, shoot, x, y, type]);
 
   return (
     <StyledGridCell

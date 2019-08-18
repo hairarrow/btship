@@ -117,7 +117,6 @@ export function useActions<T extends IState>(
     };
   }
 
-  // TODO Check if valid shot
   function shoot(targetPlayer: PlayerType, position: IPosition): TAction {
     const { players: playerState } = state;
     const {
@@ -413,8 +412,6 @@ export function useActions<T extends IState>(
       category: "Game Over",
       action: `${winner === PlayerType.Human ? "Human" : "AI"} Wins`
     });
-
-    console.log("WINNER IS", winner);
 
     return {
       type,
