@@ -106,7 +106,7 @@ export default function targetShot(
     .reduce((a, b) => [...a, ...b], []);
 
   if (hits.length >= 2) {
-    const shots = <IPosition[]>[...nextShots].filter(p => {
+    const shots = [...(nextShots as IPosition[])].filter(p => {
       // @ts-ignore
       return cellTypes[`${p.x}${p.y}`] === CellType.Empty;
     });

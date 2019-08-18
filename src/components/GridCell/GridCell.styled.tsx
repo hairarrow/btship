@@ -4,7 +4,6 @@ import { CellType } from "../../state/Models";
 
 interface IProps {
   readonly type: CellType;
-  readonly cellHeight: number;
   readonly canBeAttacked?: boolean;
 }
 
@@ -46,7 +45,6 @@ function oddCellBackground(type: CellType, theme: DefaultTheme): string {
 
 const Component = styled.div<IProps>`
   position: relative;
-  height: ${({ cellHeight }) => `${cellHeight}px`}
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: ${({ theme: { colors } }) => colors.main}
   background: ${({ type, theme }) => cellBackground(type, theme)};

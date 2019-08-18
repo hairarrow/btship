@@ -14,7 +14,7 @@ type TSegments = {
 export function createHitSegments(hits: ICell[]) {
   const dirs: TXoY[] = ["x", "y"];
   const hitSegments = dirs.reduce<{ [k in TXoY]?: TSegment }>((a, b) => {
-    [...hits].map(({ position }) => {
+    for (const { position } of hits) {
       const { x, y } = position;
       const coords = b === "y" ? b : "x";
       const coordsOp = coords === "y" ? "x" : "y";
@@ -26,7 +26,8 @@ export function createHitSegments(hits: ICell[]) {
         a[b]!.end[coordsOp] = position[coordsOp];
         a[b]!.size = a[b]!.end[coordsOp] - a[b]!.start[coordsOp];
       }
-    });
+    }
+
     return a;
   }, {});
 

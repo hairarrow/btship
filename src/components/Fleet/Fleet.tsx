@@ -1,9 +1,12 @@
-import React, { FC, useContext } from "react";
+import React, { FC, useContext, HTMLAttributes } from "react";
 import { ctx } from "../../App";
 import { PlayerType } from "../../state/Models";
 import Button from "../Button";
 
-const Fleet: FC<{ player: string }> = ({ player }) => {
+const Fleet: FC<{ player: string } & HTMLAttributes<HTMLDivElement>> = ({
+  player,
+  ...props
+}) => {
   const {
     state: { players },
     actions: { selectShip, rotateShip, finishPlacing, placeAutomatically },
@@ -14,14 +17,16 @@ const Fleet: FC<{ player: string }> = ({ player }) => {
   } = [...players].filter(({ type }) => type === player)[0];
 
   return (
-    <div>
+    <div {...props}>
       {selectedShip ? (
-        <Button
-          style={{ marginBottom: 16 }}
-          onClick={() => dispatch(rotateShip())}
-        >
-          Rotate
-        </Button>
+        <div>
+          <Button
+            style={{ marginBottom: 16 }}
+            onClick={() => dispatch(rotateShip())}
+          >
+            Rotate
+          </Button>
+        </div>
       ) : (
         ""
       )}

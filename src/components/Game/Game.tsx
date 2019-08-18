@@ -18,7 +18,9 @@ const Game: FC = () => {
   const {
     state: {
       game: { active }
-    }
+    },
+    actions: { startGame },
+    dispatch
   } = useContext(ctx);
   const [waveConfig, setWaveConfig] = useState({
     waveHeight: 1,
@@ -37,10 +39,10 @@ const Game: FC = () => {
 
     window.THREE = THREE;
     window.WAVES = WAVES(wavesConfig);
+    dispatch(startGame());
 
     return () => {
       // TODO ANIMATE THIS DESTRUCTION
-      console.log("DESTROY");
       window.WAVES.destroy();
     };
   }, [waveConfig]);
