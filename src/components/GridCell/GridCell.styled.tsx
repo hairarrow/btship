@@ -60,6 +60,22 @@ const Component = styled.div<IProps>`
     background: ${({ type, theme }) => oddCellBackground(type, theme)}
   }
 
+  &:nth-child(-n+9) {
+    border-top: 2px solid rgba(255, 255, 255, .2);
+  }
+
+  &:nth-child(n+73) {
+    border-bottom: 2px solid rgba(255, 255, 255, .2);
+  }
+
+  &:nth-child(9n+1) {
+    border-left: 2px solid rgba(255, 255, 255, .2);
+  }
+
+  &:nth-child(9n-9) {
+    border-right: 2px solid rgba(255, 255, 255, .2);
+  }
+
   &:nth-child(1) {
     border-top-left-radius: 8px;
   }
