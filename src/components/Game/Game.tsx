@@ -30,12 +30,6 @@ const Game: FC = () => {
   });
 
   useEffect(() => {
-    const { winner, over, inBattle } = game;
-    console.log("effect");
-    console.log(winner, over, inBattle);
-  }, [game, players]);
-
-  useEffect(() => {
     if (!game.inBattle) return;
     for (const { fleet, type } of players) {
       if (fleet.ships.every(ship => ship.sunk)) {
@@ -45,8 +39,8 @@ const Game: FC = () => {
           )
         );
 
-        Modal.confirm({
-          title: `You ${type === PlayerType.Human ? "Win!" : "Lose"}`,
+        const modalConfig = {
+          title: `You ${type === PlayerType.Human ? "Lose" : "Win!"}`,
           content: "Do you want to try again?",
           okText: "Try Again",
           cancelText: "Not Yet",
@@ -54,7 +48,11 @@ const Game: FC = () => {
             dispatch(resetGame());
             dispatch(startGame());
           }
-        });
+        };
+
+        if (type === PlayerType.Human) {
+          Modal.confirm(modalConfig);
+        } else Modal.success(modalConfig);
       }
     }
   }, [game, players]);

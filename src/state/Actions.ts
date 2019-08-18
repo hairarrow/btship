@@ -130,6 +130,7 @@ export function useActions<T extends IState>(
           ? { ...p, type: CellType.Hit }
           : p
       );
+      ship.sunk = ship.positions.every(pos => pos.type === CellType.Hit);
       return ship;
     });
     const shots = [...shotsState, position];
@@ -331,7 +332,9 @@ export function useActions<T extends IState>(
     const players = [...P].map(({ fleet, grid: G, shots, ...rest }) => {
       const { ships } = fleet;
       const fleetShips = [...ships].map(it => {
-        const sunk = [...it.positions].every(p => p.type === CellType.Hit);
+        const sunk = [...it.positions].every(p =>
+          [CellType.Hit, CellType.Sunk].includes(p.type)
+        );
         return {
           ...it,
           sunk,
@@ -341,7 +344,7 @@ export function useActions<T extends IState>(
           }))
         };
       });
-
+      console.log(fleetShips);
       const shipCoords = [...fleetShips].reduce<ICell[]>(
         (acc, { positions }) => [...acc, ...positions],
         []
