@@ -26,6 +26,8 @@ import {
   placeShip,
   randomPlacements
 } from "../components/Ship/ShipActions";
+import analytics from "../analytics";
+import { checkWinner } from "../components/Game/checkWinner";
 
 export function useActions<T extends IState>(
   state: T,
@@ -85,6 +87,11 @@ export function useActions<T extends IState>(
       active: true
     };
 
+    analytics.event({
+      category: "Player",
+      action: "Started Game"
+    });
+
     return {
       type: GameActions.Start,
       game
@@ -100,23 +107,14 @@ export function useActions<T extends IState>(
   function placeAutomatically(player: PlayerType): TAction {
     const players = withGridUpdate(randomPlacements(state, player));
 
+    analytics.event({
+      category: "Player",
+      action: "Place Automatically"
+    });
+
     return {
       type: PlayerActions.PlaceAutomatically,
       players
-    };
-  }
-
-  function endTurn(): TAction {
-    const {
-      game: { playerTurn: P }
-    } = state;
-    const playerTurn =
-      P === PlayerType.Human ? PlayerType.Computer : PlayerType.Human;
-    const game = { ...state.game, playerTurn };
-
-    return {
-      type: GameActions.EndTurn,
-      game
     };
   }
 
@@ -141,6 +139,11 @@ export function useActions<T extends IState>(
         ? { ...p, fleet: { ...p.fleet, ships }, shots }
         : { ...p }
     );
+
+    analytics.event({
+      category: "Player",
+      action: "Player Shot"
+    });
 
     const aiTurn = takeTurn(p, state.game.gridSize);
     const players = withGridUpdate(aiTurn);
@@ -200,6 +203,11 @@ export function useActions<T extends IState>(
         type === PlayerType.Human ? { ...p, fleet, type } : { ...p, type }
       )
     );
+
+    analytics.event({
+      category: "Player",
+      action: "Rotate Ship"
+    });
 
     return {
       type: ShipActions.Rotate,
@@ -282,6 +290,11 @@ export function useActions<T extends IState>(
       )
     );
 
+    analytics.event({
+      category: "Player",
+      action: "Manually Placed Ship"
+    });
+
     return {
       type: ShipActions.UpdateCoords,
       players
@@ -358,6 +371,7 @@ export function useActions<T extends IState>(
           }
         ];
       }, []);
+
       return {
         ...rest,
         fleet: {
@@ -368,6 +382,9 @@ export function useActions<T extends IState>(
         shots
       };
     });
+
+    const winner = checkWinner(players);
+    console.log(winner);
 
     return players;
   }
@@ -382,7 +399,6 @@ export function useActions<T extends IState>(
     removeSelectedShip,
     finishPlacing,
     shoot,
-    endTurn,
     placeAutomatically
   };
 }

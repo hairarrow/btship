@@ -65,6 +65,5 @@ export interface IActions {
   removeSelectedShip(): TAction;
   finishPlacing(): TAction;
   shoot(targetPlayer: PlayerType, position: IPosition): TAction;
-  endTurn(): TAction;
   placeAutomatically(p: PlayerType): TAction;
 }
