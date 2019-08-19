@@ -25,21 +25,10 @@ const Game: FC = () => {
     dispatch
   } = useContext(ctx);
   const defaultWaveConfig = {
-    waveHeight: 1,
-    waveSpeed: 0.5
+    waveHeight: 5,
+    waveSpeed: 2
   };
   const [waveConfig, setWaveConfig] = useState(defaultWaveConfig);
-
-  useEffect(() => {
-    if (game.inBattle) {
-      setWaveConfig({
-        waveHeight: 1.5,
-        waveSpeed: 0.8
-      });
-    } else {
-      setWaveConfig(defaultWaveConfig);
-    }
-  }, []);
 
   useEffect(() => {
     if (!game.inBattle) return;
@@ -89,7 +78,7 @@ const Game: FC = () => {
   }, [waveConfig]);
 
   useEffect(() => {
-    if (game.active) setWaveConfig({ waveHeight: 5, waveSpeed: 1 });
+    if (game.active) setWaveConfig({ waveHeight: 5, waveSpeed: 2 });
   }, [game]);
 
   return (
