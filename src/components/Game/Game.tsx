@@ -7,6 +7,7 @@ import { Modal } from "antd";
 
 import * as THREE from "three";
 import { PlayerType } from "../../state/Models";
+import Masthead from "../Masthead";
 
 const WAVES = require("vanta/src/vanta.waves").default;
 
@@ -94,6 +95,8 @@ const Game: FC = () => {
   return (
     <GameContainer id="waves">
       {game.active ? <Board /> : <StartScreen />}
+
+      <Masthead />
     </GameContainer>
   );
 };
