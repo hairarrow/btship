@@ -7,10 +7,10 @@ import React, {
   useEffect
 } from "react";
 import { ctx } from "../../App";
-import useComponentSize from "@rehooks/component-size";
 import StyledGrid from "./Grid.styled";
 import GridCell from "../GridCell";
 import { ICell } from "../../state/Models";
+import useWindowSize from "../../hooks/useWindowSize";
 
 type TProps = {
   grid: ICell[];
@@ -23,16 +23,24 @@ const Grid: FC<TProps & HTMLAttributes<HTMLDivElement>> = ({
   ...props
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
-  const { width, height } = useComponentSize(gridRef);
+  const { height, isLandscape } = useWindowSize();
   const [gridHeight, setGridHeight] = useState(0);
 
   useEffect(() => {
-    if (window.innerWidth < height * 2) {
-      setGridHeight(height / 1.33);
+    const cWidth =
+      (gridRef.current && gridRef.current.getBoundingClientRect().width) || 300;
+    const cHeight =
+      (gridRef.current && gridRef.current.getBoundingClientRect().height) ||
+      300;
+
+    setGridHeight(cWidth >= 600 ? 600 : cWidth);
+
+    if (cHeight < cWidth) {
+      setGridHeight(cHeight);
     } else {
-      setGridHeight(height);
+      setGridHeight(cWidth);
     }
-  }, [width, height]);
+  }, [isLandscape, height, gridRef]);
 
   const {
     state: {

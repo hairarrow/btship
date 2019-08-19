@@ -27,7 +27,6 @@ const BoardContainer = styled.section`
 
     &__fleet {
       grid-area: fleet;
-      justify-self: end;
     }
 
     &__grid {
@@ -45,7 +44,8 @@ const BoardContainer = styled.section`
     &__grid,
     &__player-grid,
     &__opponent-grid {
-      place-self: stretch center;
+      place-self: stretch stretch;
+      justify-content: center;
     }
 
     &__stats {
@@ -58,7 +58,7 @@ const BoardContainer = styled.section`
         "player-grid"
         "opponent-grid"
         "stats";
-      grid-template-rows: auto 1fr 1fr auto;
+      grid-template-rows: auto 120px 1fr auto;
 
       @media (${({ theme: { breakpoints } }) => breakpoints.large}) {
         grid-template-areas:
@@ -70,6 +70,9 @@ const BoardContainer = styled.section`
         grid-template-rows: auto 1fr auto;
 
         .board {
+          &__fleet {
+            justify-content: end;
+          }
           &__player-grid {
             grid-row-start: 2;
             grid-row-end: span 2;
@@ -91,9 +94,15 @@ const BoardContainer = styled.section`
       grid-template-areas:
         "header"
         "board"
-        "board"
         "fleet"
         "stats";
+
+      @media (${({ theme: { breakpoints } }) => breakpoints.small}) {
+        grid-template-areas:
+          "header header"
+          "board board"
+          "fleet stats";
+      }
 
       @media (${({ theme: { breakpoints } }) => breakpoints.large}) {
         grid-template-areas:

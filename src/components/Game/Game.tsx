@@ -23,10 +23,22 @@ const Game: FC = () => {
     actions: { startGame, gameOver, resetGame },
     dispatch
   } = useContext(ctx);
-  const [waveConfig, setWaveConfig] = useState({
+  const defaultWaveConfig = {
     waveHeight: 1,
     waveSpeed: 0.5
-  });
+  };
+  const [waveConfig, setWaveConfig] = useState(defaultWaveConfig);
+
+  useEffect(() => {
+    if (game.inBattle) {
+      setWaveConfig({
+        waveHeight: 1.5,
+        waveSpeed: 0.8
+      });
+    } else {
+      setWaveConfig(defaultWaveConfig);
+    }
+  }, []);
 
   useEffect(() => {
     if (!game.inBattle) return;

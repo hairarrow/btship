@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@rehooks/component-size": "^1.0.3",
     "antd": "^3.22.0",
     "lodash.template": "^4.5.0",
     "polished": "^3.4.1",

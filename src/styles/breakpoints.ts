@@ -1,11 +1,26 @@
-const size = {
-  mobile: "376px",
-  small: "448px",
-  medium: "672px",
-  large: "896px",
-  larger: "1120px",
-  xLarge: "1440px"
+export const sizes = {
+  mobile: 376,
+  small: 448,
+  medium: 672,
+  large: 896,
+  larger: 1120,
+  xLarge: 1440
 };
+
+const size = Object.entries(sizes).reduce<{ [k: string]: string }>(
+  (a, [k, v]) => {
+    a[k] = `${v}px`;
+    return a;
+  },
+  {}
+);
+
+// const size: { [k: string]: string } = Object.keys(sizes).reduce<{
+//   [k: string]: string;
+// }>((a, b: string) => {
+//   a[b] = `${Object.entries()}px`;
+//   return a;
+// }, {});
 
 export default {
   mobile: `min-width: ${size.mobile}`,
