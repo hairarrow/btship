@@ -42,6 +42,7 @@
     "@types/styled-components": "^4.1.18",
     "@types/three": "^0.103.2",
     "@types/utf8": "^2.1.6",
+    "eslint": "^8.38.0",
     "prettier": "^1.18.2"
   }
 }
