@@ -1,12 +1,12 @@
 import React, { useContext, HTMLAttributes, FC } from "react";
-import { ctx } from "../../App";
+import { ctx } from "../../../pages";
 import Button from "../Button";
 
 const Stats: FC<HTMLAttributes<HTMLDivElement>> = ({ ...props }) => {
   const {
     state: { stats, game },
     actions: { resetGame, startGame },
-    dispatch
+    dispatch,
   } = useContext(ctx);
 
   return (

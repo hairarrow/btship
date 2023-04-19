@@ -1,22 +1,12 @@
 import React, { FC, useContext, useEffect, useState } from "react";
-import { ctx } from "../../App";
+import { ctx } from "../../../pages";
 import StartScreen from "../StartScreen";
 import Board from "../Board";
 import GameContainer from "./Game.styled";
 import { Modal } from "antd";
 
-// import * as THREE from "three";
 import { PlayerType } from "../../state/Models";
 import Masthead from "../Masthead";
-
-const WAVES = require("vanta/src/vanta.waves").default;
-
-declare global {
-  interface Window {
-    THREE: any;
-    WAVES: any;
-  }
-}
 
 const Game: FC = () => {
   const {
@@ -57,30 +47,6 @@ const Game: FC = () => {
       }
     }
   }, [game, players, dispatch, gameOver, resetGame, startGame]);
-
-  // useEffect(() => {
-  //   const wavesConfig = {
-  //     ...waveConfig,
-  //     el: "#waves",
-  //     // color: 0x3b515f,
-  //     color: "#3b515f",
-  //     shininess: 12.0,
-  //     waveSpeed: 0.5,
-  //     zoom: 1,
-  //   };
-
-  //   window.THREE = THREE;
-  //   window.WAVES = WAVES(wavesConfig);
-
-  //   return () => {
-  //     // TODO ANIMATE THIS DESTRUCTION
-  //     window.WAVES.destroy();
-  //   };
-  // }, [waveConfig]);
-
-  // useEffect(() => {
-  //   if (game.active) setWaveConfig({ waveHeight: 5, waveSpeed: 2 });
-  // }, [game]);
 
   return (
     <GameContainer id="waves">

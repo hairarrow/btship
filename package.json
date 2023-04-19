@@ -5,22 +5,17 @@
   "dependencies": {
     "antd": "^3.22.0",
     "lodash.template": "^4.5.0",
+    "next": "latest",
     "polished": "^3.4.1",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-ga": "^2.6.0",
-    "react-scripts": "3.0.1",
     "styled-components": "^4.3.2",
-    "three": "^0.107.0",
-    "typescript": "^5.0.4",
-    "vanta": "tengbao/vanta#master"
+    "typescript": "^5.0.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "deploy": "firebase deploy"
+    "start": "next dev",
+    "build": "next build"
   },
   "eslintConfig": {
     "extends": "react-app"

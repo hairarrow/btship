@@ -3,9 +3,9 @@ import React, {
   useContext,
   HTMLAttributes,
   useState,
-  useCallback
+  useCallback,
 } from "react";
-import { ctx } from "../../App";
+import { ctx } from "../../../pages";
 import { PlayerType } from "../../state/Models";
 import Button from "../Button";
 import useWindowSize from "../../hooks/useWindowSize";
@@ -18,10 +18,10 @@ const Fleet: FC<{ player: string } & HTMLAttributes<HTMLDivElement>> = ({
   const {
     state: { players },
     actions: { selectShip, rotateShip, finishPlacing, placeAutomatically },
-    dispatch
+    dispatch,
   } = useContext(ctx);
   const {
-    fleet: { ships, selectedShip }
+    fleet: { ships, selectedShip },
   } = [...players].filter(({ type }) => type === player)[0];
   const { isLarge } = useWindowSize();
   const [fleetVisible, setFleetVisible] = useState(false);
