@@ -1,5 +1,5 @@
 import React, { FC, useContext } from "react";
-import { ctx } from "../../App";
+import { ctx } from "../../../pages";
 import { PlayerType } from "../../state/Models";
 import Grid from "../Grid";
 import Fleet from "../Fleet";
@@ -12,8 +12,8 @@ const Board: FC = () => {
   const {
     state: {
       game: { placing, playerTurn },
-      players
-    }
+      players,
+    },
   } = useContext(ctx);
 
   return placing ? (

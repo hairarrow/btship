@@ -4,9 +4,9 @@ import React, {
   HTMLAttributes,
   useState,
   useRef,
-  useEffect
+  useEffect,
 } from "react";
-import { ctx } from "../../App";
+import { ctx } from "../../../pages";
 import StyledGrid from "./Grid.styled";
 import GridCell from "../GridCell";
 import { ICell } from "../../state/Models";
@@ -44,10 +44,10 @@ const Grid: FC<TProps & HTMLAttributes<HTMLDivElement>> = ({
 
   const {
     state: {
-      game: { gridSize }
+      game: { gridSize },
     },
     actions: { removeSelectedShip },
-    dispatch
+    dispatch,
   } = useContext(ctx);
 
   return (

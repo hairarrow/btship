@@ -1,12 +1,12 @@
 import React, { FC, useContext } from "react";
-import { ctx } from "../../App";
+import { ctx } from "../../../pages";
 import Container from "./StartScreen.styled";
 import Button from "../Button";
 
 const StartScreen: FC = () => {
   const {
     dispatch,
-    actions: { startGame }
+    actions: { startGame },
   } = useContext(ctx);
 
   return (

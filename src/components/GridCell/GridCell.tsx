@@ -1,7 +1,7 @@
 import React, { FC, useContext, useCallback } from "react";
 import StyledGridCell from "./GridCell.styled";
 import { ICell, CellType, PlayerType } from "../../state/Models";
-import { ctx } from "../../App";
+import { ctx } from "../../../pages";
 import getHumanPlayer from "../../lib/getHumanPlayer";
 
 type TProps = {
@@ -13,24 +13,24 @@ type TProps = {
 
 const GridCell: FC<TProps> = ({
   cell: {
-    position: { x, y }
+    position: { x, y },
   },
   odd,
   type,
-  canBeAttacked
+  canBeAttacked,
 }) => {
   const {
     state: {
       game: { placing },
-      players
+      players,
     },
     actions: { moveShip, manualPlaceShip: placeShip, selectShip, shoot },
-    dispatch
+    dispatch,
   } = useContext(ctx);
   const handleHoverEnter = useCallback(() => {
     if (!placing) return;
     const {
-      fleet: { selectedShip }
+      fleet: { selectedShip },
     } = getHumanPlayer(players);
     if (!selectedShip) return;
 
@@ -40,7 +40,7 @@ const GridCell: FC<TProps> = ({
   const handleClick = useCallback(() => {
     if (!placing) return;
     const {
-      fleet: { selectedShip, ships }
+      fleet: { selectedShip, ships },
     } = getHumanPlayer(players);
 
     if (type === CellType.Ship) {

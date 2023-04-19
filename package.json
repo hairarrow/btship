@@ -5,25 +5,17 @@
   "dependencies": {
     "antd": "^3.22.0",
     "lodash.template": "^4.5.0",
+    "next": "latest",
     "polished": "^3.4.1",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-ga": "^2.6.0",
-    "react-scripts": "3.0.1",
     "styled-components": "^4.3.2",
-    "three": "^0.107.0",
-    "typescript": "3.5.3",
-    "vanta": "tengbao/vanta#master"
+    "typescript": "^5.0.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "deploy": "firebase deploy"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
+    "start": "next dev",
+    "build": "next build"
   },
   "browserslist": {
     "production": [
@@ -47,6 +39,7 @@
     "@types/styled-components": "^4.1.18",
     "@types/three": "^0.103.2",
     "@types/utf8": "^2.1.6",
+    "eslint": "^8.38.0",
     "prettier": "^1.18.2"
   }
 }
